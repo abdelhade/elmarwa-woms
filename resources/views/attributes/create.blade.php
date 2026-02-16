@@ -1,0 +1,130 @@
+@extends('layouts.master')
+
+@section('title', 'إضافة خاصية جديدة')
+@section('page-title', 'إضافة خاصية جديدة')
+
+@section('content')
+
+@include('partials.alerts')
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="card-title mb-0 text-primary">
+                    <i class="bi bi-plus-circle me-2"></i>بيانات الخاصية
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ route('attributes.store') }}" method="POST" id="attributeForm">
+                    @csrf
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label fw-bold">اسم الخاصية <span class="text-danger">*</span></label>
+                        <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" 
+                               value="{{ old('name') }}" placeholder="مثال: نوع الورق، الطول، العرض" required>
+                        @error('name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="type" class="form-label fw-bold">نوع الخاصية <span class="text-danger">*</span></label>
+                            <select name="type" id="type" class="form-select @error('type') is-invalid @enderror" required>
+                                @foreach($types as $key => $value)
+                                    <option value="{{ $key }}" {{ old('type') == $key ? 'selected' : '' }}>
+                                        {{ $value }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('type')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold d-block">إعدادات إضافية</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" name="is_required" id="is_required" 
+                                       role="switch" {{ old('is_required') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_required">هذه الخاصية إجبارية</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="optionsWrapper" class="mb-4 d-none">
+                        <label class="form-label fw-bold">الخيارات (لقائمة الاختيار) <span class="text-danger">*</span></label>
+                        <div id="optionsList">
+                            @if(old('options'))
+                                @foreach(old('options') as $option)
+                                    <div class="input-group mb-2 option-item">
+                                        <input type="text" name="options[]" class="form-control" value="{{ $option }}" placeholder="أدخل خياراً..." required>
+                                        <button type="button" class="btn btn-outline-danger btn-remove-option">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="input-group mb-2 option-item">
+                                    <input type="text" name="options[]" class="form-control" placeholder="أدخل خياراً..." required disabled>
+                                    <button type="button" class="btn btn-outline-danger btn-remove-option">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddOption">
+                            <i class="bi bi-plus-lg me-1"></i>إضافة خيار آخر
+                        </button>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end border-top pt-4">
+                        <a href="{{ route('attributes.index') }}" class="btn btn-light px-4">إلغاء</a>
+                        <button type="submit" class="btn btn-primary px-5">حفظ الخاصية</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@endsection
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    function toggleOptions() {
+        if ($('#type').val() === 'select') {
+            $('#optionsWrapper').removeClass('d-none');
+            $('#optionsWrapper input').prop('disabled', false);
+        } else {
+            $('#optionsWrapper').addClass('d-none');
+            $('#optionsWrapper input').prop('disabled', true);
+        }
+    }
+
+    $('#type').on('change', toggleOptions);
+    toggleOptions();
+
+    $('#btnAddOption').on('click', function() {
+        const newItem = `
+            <div class="input-group mb-2 option-item">
+                <input type="text" name="options[]" class="form-control" placeholder="أدخل خياراً..." required>
+                <button type="button" class="btn btn-outline-danger btn-remove-option">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `;
+        $('#optionsList').append(newItem);
+    });
+
+    $(document).on('click', '.btn-remove-option', function() {
+        if ($('.option-item').length > 1) {
+            $(this).closest('.option-item').remove();
+        } else {
+            $(this).siblings('input').val('');
+        }
+    });
+});
+</script>
+@endpush

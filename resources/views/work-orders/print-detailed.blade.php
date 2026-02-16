@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>طباعة مفصل أمر عمل — {{ $workOrder->order_number }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; font-size: 13pt; background: #fff; color: #222; padding: 2rem; }
+        .print-header { text-align: center; margin-bottom: 2rem; border-bottom: 2px solid #333; padding-bottom: 1rem; }
+        .print-header h2 { margin: 0; font-weight: 700; }
+        .print-header p { margin: 0.25rem 0 0; opacity: 0.7; font-size: 11pt; }
+        .info-table td { padding: 0.3rem 0.75rem; }
+        .info-table .label { font-weight: 600; width: 140px; }
+        .section-title { font-weight: 700; font-size: 14pt; margin: 1.5rem 0 0.5rem; border-bottom: 1px solid #ccc; padding-bottom: 0.25rem; }
+        .items-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .items-table th, .items-table td { border: 1px solid #ddd; padding: 0.5rem; text-align: center; }
+        .items-table th { background-color: #f8f9fa; }
+        @media print {
+            body { padding: 0; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="no-print text-center mb-4">
+    <button class="btn btn-primary btn-print" onclick="window.print()">طباعة</button>
+    <a href="{{ route('work-orders.index') }}" class="btn btn-outline-secondary">رجوع</a>
+</div>
+
+<div class="print-header">
+    <h2>أمر عمل (مفصل)</h2>
+    <p>{{ $workOrder->order_number }} — {{ $workOrder->created_at?->format('d/m/Y') }}</p>
+</div>
+
+<div class="section-title">بيانات العميل والأمر الأساسي</div>
+<table class="info-table">
+    <tr><td class="label">رقم الأمر:</td><td>{{ $workOrder->order_number }}</td></tr>
+    <tr><td class="label">العميل:</td><td>{{ $workOrder->client->name ?? '—' }}</td></tr>
+    <tr><td class="label">الحالة:</td><td>{{ $workOrder->status->label() }}</td></tr>
+    <tr><td class="label">تاريخ التسليم:</td><td>{{ $workOrder->due_date?->format('d/m/Y') ?? '—' }}</td></tr>
+</table>
+
+<div class="section-title">أصناف الأمر</div>
+<table class="items-table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>الصنف</th>
+            <th>التصنيف</th>
+            <th>الكمية</th>
+            <th>سعر الوحدة</th>
+            <th>الإجمالي</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($workOrder->details as $index => $detail)
+            <tr>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ $detail->product->name ?? '—' }}</td>
+                <td>{{ $detail->product->category->name ?? '—' }}</td>
+                <td>{{ number_format((float)$detail->quantity, 2) }}</td>
+                <td>{{ number_format((float)$detail->unit_price, 2) }}</td>
+                <td>{{ number_format((float)$detail->total_price, 2) }}</td>
+            </tr>
+        @endforeach
+    </tbody>
+    <tfoot>
+        <tr class="fw-bold">
+            <td colspan="3" class="text-end">الإجمالي الكلي:</td>
+            <td>{{ number_format($workOrder->details->sum('quantity'), 2) }}</td>
+            <td>—</td>
+            <td>{{ number_format($workOrder->total_price, 2) }}</td>
+        </tr>
+    </tfoot>
+</table>
+
+@if($workOrder->notes)
+    <div class="section-title">ملاحظات</div>
+    <p>{{ $workOrder->notes }}</p>
+@endif
+
+<div style="margin-top: 3rem; display: flex; justify-content: space-between;">
+    <div style="text-align: center; width: 200px;"><div style="border-top: 1px solid #999; padding-top: 0.5rem;">توقيع المسؤول</div></div>
+    <div style="text-align: center; width: 200px;"><div style="border-top: 1px solid #999; padding-top: 0.5rem;">توقيع العميل</div></div>
+</div>
+
+</body>
+</html>

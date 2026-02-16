@@ -1,0 +1,481 @@
+/* ============================================================
+   Work Order Management System — Global Styles (RTL)
+   ============================================================ */
+
+:root {
+    --sidebar-width: 260px;
+    --sidebar-collapsed: 0px;
+    --topbar-height: 60px;
+    --transition-speed: 0.3s;
+
+    /* Light mode palette */
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-light: #eef2ff;
+    --accent: #06b6d4;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+
+    --sidebar-bg: #1e1b4b;
+    --sidebar-text: #c7d2fe;
+    --sidebar-active: #4f46e5;
+    --sidebar-hover: rgba(255, 255, 255, 0.08);
+
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --card-shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================================
+   Typography
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.9rem;
+    overflow-x: hidden;
+    direction: rtl;
+}
+
+/* ============================================================
+   Sidebar (RTL: right side)
+   ============================================================ */
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: auto;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    z-index: 1040;
+    transition: transform var(--transition-speed) ease;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.sidebar-brand {
+    padding: 1.25rem 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.025em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.sidebar-brand i {
+    font-size: 1.5rem;
+    color: var(--accent);
+}
+
+.sidebar-nav {
+    padding: 1rem 0;
+    flex: 1;
+}
+
+.sidebar-nav .nav-label {
+    padding: 0.75rem 1.5rem 0.4rem;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.35);
+    font-weight: 600;
+}
+
+.sidebar-nav .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1.5rem;
+    color: var(--sidebar-text);
+    font-weight: 500;
+    font-size: 0.85rem;
+    border-radius: 0;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.sidebar-nav .nav-link:hover {
+    background: var(--sidebar-hover);
+    color: #fff;
+}
+
+.sidebar-nav .nav-link.active {
+    background: var(--sidebar-active);
+    color: #fff;
+    font-weight: 600;
+}
+
+.sidebar-nav .nav-link i {
+    width: 20px;
+    text-align: center;
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+.sidebar-nav .nav-link.active i {
+    opacity: 1;
+}
+
+/* ============================================================
+   Main Content & Topbar (RTL: margin-right)
+   ============================================================ */
+.main-content {
+    margin-right: var(--sidebar-width);
+    margin-left: 0;
+    min-height: 100vh;
+    transition: margin-right var(--transition-speed) ease;
+}
+
+.topbar {
+    height: var(--topbar-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    border-bottom: 1px solid var(--bs-border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background: var(--bs-body-bg);
+    backdrop-filter: blur(10px);
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.btn-sidebar-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: var(--bs-body-color);
+}
+
+.page-content {
+    padding: 1.5rem;
+}
+
+/* ============================================================
+   Theme Toggle
+   ============================================================ */
+.theme-toggle {
+    border: none;
+    background: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.375rem;
+    border-radius: 0.5rem;
+    color: var(--bs-body-color);
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+}
+
+.theme-toggle:hover {
+    background: var(--bs-tertiary-bg);
+}
+
+/* ============================================================
+   Summary Cards
+   ============================================================ */
+.stat-card {
+    border: none;
+    border-radius: 0.875rem;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.stat-card .card-body {
+    padding: 1.25rem;
+}
+
+.stat-card .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.stat-card .stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.stat-card .stat-label {
+    font-size: 0.775rem;
+    font-weight: 500;
+    opacity: 0.7;
+}
+
+.icon-primary { background: var(--primary-light); color: var(--primary); }
+.icon-success { background: #ecfdf5; color: var(--success); }
+.icon-warning { background: #fffbeb; color: var(--warning); }
+.icon-info { background: #eff6ff; color: var(--info); }
+
+[data-bs-theme="dark"] .icon-primary { background: rgba(79, 70, 229, 0.15); }
+[data-bs-theme="dark"] .icon-success { background: rgba(16, 185, 129, 0.15); }
+[data-bs-theme="dark"] .icon-warning { background: rgba(245, 158, 11, 0.15); }
+[data-bs-theme="dark"] .icon-info { background: rgba(59, 130, 246, 0.15); }
+
+/* ============================================================
+   Status Badges
+   ============================================================ */
+.badge-pending { background: #fef3c7; color: #92400e; }
+.badge-in_progress { background: #dbeafe; color: #1e40af; }
+.badge-completed { background: #d1fae5; color: #065f46; }
+.badge-cancelled { background: #fee2e2; color: #991b1b; }
+
+[data-bs-theme="dark"] .badge-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+[data-bs-theme="dark"] .badge-in_progress { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+[data-bs-theme="dark"] .badge-completed { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+[data-bs-theme="dark"] .badge-cancelled { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+/* ============================================================
+   Tables
+   ============================================================ */
+.table-card {
+    border: none;
+    border-radius: 0.875rem;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+}
+
+.table-card .card-header {
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--bs-border-color);
+    padding: 1rem 1.25rem;
+    background: transparent;
+}
+
+.table-card .table {
+    margin-bottom: 0;
+    font-size: 0.85rem;
+}
+
+.table-card .table th {
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+    border-bottom-width: 1px;
+}
+
+.table th, .table td {
+    text-align: right;
+}
+
+/* ============================================================
+   Chart Containers
+   ============================================================ */
+.chart-card {
+    border: none;
+    border-radius: 0.875rem;
+    box-shadow: var(--card-shadow);
+}
+
+.chart-card .card-header {
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--bs-border-color);
+    padding: 1rem 1.25rem;
+    background: transparent;
+}
+
+/* ============================================================
+   Login Page
+   ============================================================ */
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+    padding: 1rem;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+
+.login-card .card-body {
+    padding: 2.5rem;
+}
+
+.login-brand {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-brand h2 {
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.login-brand p {
+    font-size: 0.85rem;
+    opacity: 0.6;
+}
+
+.login-card .form-control {
+    padding: 0.7rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.login-card .form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.15);
+}
+
+.login-card .btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    padding: 0.7rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.login-card .btn-primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+/* ============================================================
+   RTL Input Group fix
+   ============================================================ */
+.input-group > .input-group-text:first-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+.input-group > .form-control:last-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+}
+
+/* ============================================================
+   Dropdown RTL
+   ============================================================ */
+.dropdown-menu {
+    text-align: right;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 991.98px) {
+    .sidebar {
+        transform: translateX(100%);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-right: 0;
+    }
+
+    .btn-sidebar-toggle {
+        display: block;
+    }
+
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1035;
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+    }
+}
+
+/* ============================================================
+   Pagination Customization
+   ============================================================ */
+.pagination {
+    margin-bottom: 0;
+    gap: 5px;
+}
+
+.page-link {
+    border: none;
+    color: var(--bs-body-color);
+    border-radius: 8px !important;
+    margin: 0 2px;
+    padding: 0.5rem 0.85rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    background: var(--bs-tertiary-bg);
+}
+
+.page-link:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.page-item.active .page-link {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
+}
+
+.page-item.disabled .page-link {
+    background: transparent;
+    opacity: 0.5;
+}
+
+/* RTL Arrow Fix */
+.page-item:first-child .page-link, 
+.page-item:last-child .page-link {
+    font-family: sans-serif; /* For better arrow alignment */
+}
