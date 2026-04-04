@@ -24,7 +24,26 @@
             <div class="card-header">بيانات الأمر</div>
             <div class="card-body">
                 <div class="detail-row"><span class="detail-label">رقم الأمر</span><span class="detail-value fw-bold">{{ $workOrder->order_number }}</span></div>
-                <div class="detail-row"><span class="detail-label">الحالة</span><span class="detail-value"><span class="badge badge-{{ $workOrder->status->value }} rounded-pill px-2 py-1">{{ $workOrder->status->label() }}</span></span></div>
+                <div class="detail-row"><span class="detail-label">الحالة</span>
+                    <span class="detail-value">
+                        <div class="dropdown d-inline">
+                            <button class="btn btn-sm text-white dropdown-toggle badge-{{ $workOrder->status->value }} rounded-pill px-2 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size:0.8rem; border:none;">
+                                {{ $workOrder->status->label() }}
+                            </button>
+                            <ul class="dropdown-menu shadow-sm" style="font-size:0.85rem; min-width:auto;">
+                                @foreach(\App\Enums\WorkOrderStatus::cases() as $s)
+                                    <li>
+                                        <form action="{{ route('work-orders.update-status', $workOrder) }}" method="POST">
+                                            @csrf @method('PATCH')
+                                            <input type="hidden" name="status" value="{{ $s->value }}">
+                                            <button type="submit" class="dropdown-item py-1 {{ $workOrder->status->value == $s->value ? 'active' : '' }}">{{ $s->label() }}</button>
+                                        </form>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </span>
+                </div>
                 <div class="detail-row"><span class="detail-label">العميل</span><span class="detail-value"><a href="{{ route('clients.show', $workOrder->client_id) }}">{{ $workOrder->client->name ?? '—' }}</a></span></div>
                 <div class="detail-row"><span class="detail-label">الموظف</span><span class="detail-value">{{ $workOrder->employee->name ?? '—' }}</span></div>
                 <div class="detail-row"><span class="detail-label">المشغل</span><span class="detail-value">{{ $workOrder->operator->name ?? '—' }}</span></div>

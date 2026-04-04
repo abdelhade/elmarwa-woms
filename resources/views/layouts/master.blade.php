@@ -196,6 +196,13 @@
                 <i class="bi bi-bar-chart-line"></i>
                 التقارير
             </a>
+
+            <div class="nav-label">النظام</div>
+
+            <a href="{{ route('settings.index') }}" class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                <i class="bi bi-gear"></i>
+                الإعدادات
+            </a>
         </nav>
     </aside>
 

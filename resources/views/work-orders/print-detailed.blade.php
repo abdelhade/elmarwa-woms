@@ -34,7 +34,7 @@
 
 <div class="no-print text-center mb-4 d-flex justify-content-center align-items-center gap-2">
     <label for="copyCount" class="fw-bold mb-0">عدد النسخ:</label>
-    <input type="number" id="copyCount" class="form-control text-center" style="width: 80px;" value="1" min="1" max="20" onchange="generateCopies()">
+    <input type="number" id="copyCount" class="form-control text-center" style="width: 80px;" value="{{ \App\Helpers\Setting::get('default_print_copies', 1) }}" min="1" max="20" onchange="generateCopies()">
     <button class="btn btn-primary" onclick="window.print()"><i class="bi bi-printer"></i> طباعة</button>
     <a href="{{ route('work-orders.show', $workOrder) }}" class="btn btn-outline-secondary">رجوع</a>
 </div>
@@ -65,29 +65,43 @@
         </tr>
     </thead>
     <tbody>
-        @foreach($workOrder->details as $index => $detail)
-            <tr>
-                <td>
-                    <strong>{{ $detail->product->name ?? '—' }}</strong><br>
-                    <span style="font-size: 10pt; color: #222;">[{{ $detail->product->category->name ?? '—' }}]</span>
-                    
-                    @if(!empty($detail->attributes) || !empty($detail->category_attributes))
-                        <div class="attr-text" style="margin-top: 3px;">
-                        @if($detail->category_attributes)
-                            @foreach($detail->category_attributes as $attr)
-                                {{ $attr['name'] ?? '' }}{{ !empty($attr['value']) ? ': ' . $attr['value'] : '' }} | 
-                            @endforeach
-                        @endif
-                        @if($detail->attributes)
-                            @foreach($detail->attributes as $attr)
-                                {{ $attr['name'] ?? '' }}{{ !empty($attr['value']) ? ': ' . $attr['value'] : '' }} | 
-                            @endforeach
-                        @endif
-                        </div>
-                    @endif
+        @php
+            $groupedDetails = $workOrder->details->groupBy(function($detail) {
+                $catName = $detail->product->category->name ?? 'بدون تصنيف';
+                $catAttrStr = '';
+                if (!empty($detail->category_attributes) && is_array($detail->category_attributes)) {
+                    $attrs = collect($detail->category_attributes)->map(function($a) {
+                        return ($a['name'] ?? '') . (!empty($a['value']) ? ': ' . $a['value'] : '');
+                    })->implode(' | ');
+                    if ($attrs) {
+                        $catAttrStr = ' - ' . $attrs;
+                    }
+                }
+                return $catName . $catAttrStr;
+            });
+        @endphp
+
+        @foreach($groupedDetails as $groupName => $details)
+            <tr style="background-color: #f1f1f1;">
+                <td colspan="2" style="font-weight: bold; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 6px 5px;">
+                    {{ $groupName }}
                 </td>
-                <td class="qty-col align-middle">{{ number_format((float)$detail->quantity, 2) }}</td>
             </tr>
+            @foreach($details as $index => $detail)
+                <tr>
+                    <td style="padding-right: 15px;">
+                        <strong>{{ $detail->product->name ?? '—' }}</strong>
+                        @if(!empty($detail->attributes))
+                            <span class="attr-text" style="display: inline-block; margin-right: 10px; color: #444; font-weight: normal;">
+                            (@foreach($detail->attributes as $attr)
+                                {{ $attr['name'] ?? '' }}{{ !empty($attr['value']) ? ': ' . $attr['value'] : '' }} {{ !$loop->last ? '| ' : '' }}
+                            @endforeach)
+                            </span>
+                        @endif
+                    </td>
+                    <td class="qty-col align-middle">{{ number_format((float)$detail->quantity, 2) }}</td>
+                </tr>
+            @endforeach
         @endforeach
     </tbody>
     <tfoot>

@@ -11,6 +11,7 @@ use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\CategoryAttributeController;
+use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
 
 // ── Guest Routes ──
@@ -31,6 +32,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+    // ── Settings ──
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
 
     // ── Users Management ──
     Route::middleware('permission:users.view')->group(function () {
@@ -126,6 +131,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:work-orders.edit')->group(function () {
         Route::get('work-orders/{workOrder}/edit', [WorkOrderController::class, 'edit'])->name('work-orders.edit');
         Route::put('work-orders/{workOrder}', [WorkOrderController::class, 'update'])->name('work-orders.update');
+        Route::patch('work-orders/{workOrder}/status', [WorkOrderController::class, 'updateStatus'])->name('work-orders.update-status');
     });
     Route::middleware('permission:work-orders.delete')->group(function () {
         Route::delete('work-orders/{workOrder}', [WorkOrderController::class, 'destroy'])->name('work-orders.destroy');

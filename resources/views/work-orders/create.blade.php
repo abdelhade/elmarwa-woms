@@ -421,8 +421,30 @@
         addDatalist($detBody.find(`.wo-attr-input[data-idx="${_rowCount}"][data-type="item"]`), _itemAttrsList);
         
         // Initialize Select2
-        $detBody.find(`.wo-cat-select[data-idx="${_rowCount}"]`).select2({ width: '100%' });
-        $detBody.find(`.wo-prod-select[data-idx="${_rowCount}"]`).select2({ width: '100%' });
+        const $catSelect = $detBody.find(`.wo-cat-select[data-idx="${_rowCount}"]`);
+        const $prodSelect = $detBody.find(`.wo-prod-select[data-idx="${_rowCount}"]`);
+        $catSelect.select2({ width: '100%' });
+        $prodSelect.select2({ width: '100%' });
+
+        // Copy category and category attributes from the previous row
+        const $rows = $detBody.find('tr.wo-item-row');
+        if ($rows.length > 1) {
+            const $prevRow = $rows.eq($rows.length - 2);
+            const prevIdx = $prevRow.data('idx');
+            
+            // Copy category
+            const prevCat = $prevRow.find('.wo-cat-select').val();
+            if (prevCat) {
+                $catSelect.val(prevCat).trigger('change');
+            }
+            
+            // Copy category attributes
+            if (_rowAttrs[prevIdx] && _rowAttrs[prevIdx]['cat'] && _rowAttrs[prevIdx]['cat'].length > 0) {
+                if (!_rowAttrs[_rowCount]) _rowAttrs[_rowCount] = { cat: [], item: [] };
+                _rowAttrs[_rowCount]['cat'] = JSON.parse(JSON.stringify(_rowAttrs[prevIdx]['cat']));
+                renderAttributes(_rowCount, 'cat');
+            }
+        }
         
         _rowCount++;
     }

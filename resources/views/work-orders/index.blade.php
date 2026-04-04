@@ -92,7 +92,24 @@
                         <td>{{ $order->product->name ?? '—' }}</td>
                         <td>{{ number_format((float)$order->quantity, 0) }}</td>
                         <td>{{ number_format((float)$order->total_price, 2) }}</td>
-                        <td><span class="badge badge-{{ $order->status->value }} rounded-pill px-2 py-1" style="font-size:0.7rem;">{{ $order->status->label() }}</span></td>
+                        <td>
+                            <div class="dropdown d-inline">
+                                <button class="btn btn-sm text-white dropdown-toggle badge-{{ $order->status->value }} rounded-pill px-2 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size:0.7rem; border:none;">
+                                    {{ $order->status->label() }}
+                                </button>
+                                <ul class="dropdown-menu shadow-sm" style="font-size:0.8rem; min-width:auto;">
+                                    @foreach(\App\Enums\WorkOrderStatus::cases() as $s)
+                                        <li>
+                                            <form action="{{ route('work-orders.update-status', $order) }}" method="POST">
+                                                @csrf @method('PATCH')
+                                                <input type="hidden" name="status" value="{{ $s->value }}">
+                                                <button type="submit" class="dropdown-item py-1 {{ $order->status->value == $s->value ? 'active' : '' }}">{{ $s->label() }}</button>
+                                            </form>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </td>
                         <td style="font-size:0.8rem;">{{ $order->created_at?->format('d/m/Y') }}</td>
                         <td class="actions-cell">
                             <a href="{{ route('work-orders.show', $order) }}" class="btn btn-sm btn-outline-primary" title="عرض"><i class="bi bi-eye"></i></a>

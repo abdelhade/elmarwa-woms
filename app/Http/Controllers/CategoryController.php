@@ -47,6 +47,8 @@ class CategoryController extends Controller
             'attributes' => 'nullable|array',
             'attributes.*.name' => 'required|string|max:255',
             'attributes.*.type' => 'required|string|in:text,number,select',
+        ], [
+            'name.unique' => 'خطأ: اسم التصنيف مكرر. لا يمكن إضافة تصنيف بنفس الاسم.',
         ]);
 
         $data['slug'] = Str::slug($data['name']);
@@ -88,6 +90,8 @@ class CategoryController extends Controller
             'attributes' => 'nullable|array',
             'attributes.*.name' => 'required|string|max:255',
             'attributes.*.type' => 'required|string|in:text,number,select',
+        ], [
+            'name.unique' => 'خطأ: اسم التصنيف مكرر. لا يمكن إضافة تصنيف بنفس الاسم.',
         ]);
 
         $data['slug'] = Str::slug($data['name']);

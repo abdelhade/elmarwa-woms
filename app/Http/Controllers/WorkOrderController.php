@@ -141,6 +141,14 @@ class WorkOrderController extends Controller
             ->with('success', 'تم تحديث أمر العمل بنجاح.');
     }
 
+    public function updateStatus(Request $request, WorkOrder $workOrder): RedirectResponse
+    {
+        $request->validate(['status' => 'required|string']);
+        $workOrder->update(['status' => $request->status]);
+
+        return back()->with('success', 'تم تحديث حالة أمر العمل بنجاح.');
+    }
+
     public function duplicate(WorkOrder $workOrder): RedirectResponse
     {
         $newOrder = $this->orderProcessingService->duplicateWorkOrder($workOrder);
@@ -168,7 +176,17 @@ class WorkOrderController extends Controller
         $workOrder->load(['client', 'product.category', 'orderBatch', 'details.product.category', 'employee', 'operator', 'supervisor']);
         
         $summary = $workOrder->details->groupBy(function($detail) {
-            return $detail->product->category->name ?? 'بدون تصنيف';
+            $catName = $detail->product->category->name ?? 'بدون تصنيف';
+            $catAttrStr = '';
+            if (!empty($detail->category_attributes) && is_array($detail->category_attributes)) {
+                $attrs = collect($detail->category_attributes)->map(function($a) {
+                    return ($a['name'] ?? '') . (!empty($a['value']) ? ': ' . $a['value'] : '');
+                })->implode(' | ');
+                if ($attrs) {
+                    $catAttrStr = ' - ' . $attrs;
+                }
+            }
+            return $catName . $catAttrStr;
         })->map(function($items) {
             return $items->sum('quantity');
         });
