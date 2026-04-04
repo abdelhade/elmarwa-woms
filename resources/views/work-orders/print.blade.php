@@ -6,8 +6,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        @page { margin: 0; size: 80mm auto; }
-        body { font-family: 'Cairo', sans-serif; font-size: 12pt; font-weight: 600; background: #fff; color: #000; margin: 0 auto; padding: 10px; width: 80mm; max-width: 80mm; box-sizing: border-box; }
+        @page { margin: 0; size: 75mm auto; }
+        body { font-family: 'Cairo', sans-serif; font-size: 12pt; font-weight: 600; background: #fff; color: #000; margin: 0 auto; padding: 15px; width: 75mm; max-width: 75mm; box-sizing: border-box; }
         .print-header { text-align: center; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 10px; }
         .print-header h2 { margin: 0; font-size: 16pt; font-weight: 700; }
         .print-header p { margin: 2px 0 0; font-size: 11pt; }
