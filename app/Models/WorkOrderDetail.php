@@ -20,6 +20,7 @@ class WorkOrderDetail extends Model
         'unit_price',
         'total_price',
         'attributes',
+        'category_attributes',
     ];
 
     /**
@@ -35,6 +36,7 @@ class WorkOrderDetail extends Model
             'unit_price' => 'decimal:2',
             'total_price' => 'decimal:2',
             'attributes' => 'array',
+            'category_attributes' => 'array',
         ];
     }
 

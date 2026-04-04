@@ -285,139 +285,45 @@
             <div class="card-body">
                 <div class="wo-section-title mb-2"><i class="bi bi-box-seam"></i> أصناف أمر العمل</div>
 
-                {{-- Selected Details Table --}}
-                <div class="table-responsive">
+                <div class="table-responsive" style="overflow: visible;">
                     <table class="table table-bordered table-sm-custom wo-details-table mb-0" id="woDetailsTable">
                         <thead class="table-light">
                             <tr>
-                                <th style="width:5%">#</th>
-                                <th style="width:30%">الصنف</th>
-                                <th>المجموعة</th>
-                                <th style="width:20%">الخصائص</th>
+                                <th style="width:20%">التصنيف</th>
+                                <th style="width:20%">خصائص التصنيف</th>
+                                <th style="width:20%">الصنف</th>
+                                <th style="width:25%">خصائص الصنف</th>
                                 <th style="width:10%">الكمية</th>
-                                <th style="width:10%">سعر الوحدة</th>
-                                <th style="width:10%">الإجمالي</th>
-                                <th style="width:4%"></th>
+                                <th style="width:5%"></th>
                             </tr>
                         </thead>
                         <tbody id="woDetailsBody">
                             {{-- Rows added dynamically --}}
                         </tbody>
-                        <tbody>
-                            {{-- Inline Search Row --}}
-                            <tr>
-                                <td class="text-center align-middle bg-light"><i class="bi bi-search text-secondary small"></i></td>
-                                <td colspan="2" class="p-0 position-relative">
-                                    <div class="wo-ac-wrap w-100">
-                                        <input type="text" id="woProductSearch" class="form-control form-control-sm border-0 py-2 px-3" 
-                                               style="background: none; outline: none; box-shadow: none;"
-                                               placeholder="ابحث هنا لإضافة صنف جديد... (F2)" autocomplete="off">
-                                        
-                                        <div class="wo-ac-dropdown" id="woAcDropdown" style="width: 100%;">
-                                            <table class="table table-hover mb-0">
-                                                <thead>
-                                                    <tr class="bg-light">
-                                                        <th style="width:50%">الصنف</th>
-                                                        <th>الكود</th>
-                                                        <th>المجموعة</th>
-                                                        <th class="text-end">السعر</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="woAcBody"></tbody>
-                                            </table>
-                                            <div class="wo-ac-noresult" id="woAcNoResult" style="display:none;">
-                                                <div class="p-3 text-center text-muted">لا توجد نتائج</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td colspan="3" class="align-middle text-muted small px-3 bg-light">
-                                    <i class="bi bi-keyboard me-1"></i> ابحث عن الصنف ثم اضغط <kbd class="bg-secondary opacity-75">Enter</kbd>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tfoot id="woDetailsFoot" style="display:none;">
-                            <tr class="table-light">
-                                <td colspan="6" class="text-start fw-bold py-2">الإجمالي الكلي</td>
-                                <td class="wo-grand-total py-2" id="woGrandTotal">0.00</td>
-                                <td></td>
-                            </tr>
-                        </tfoot>
                     </table>
-                    <div class="wo-details-empty" id="woDetailsEmpty">
-                        <i class="bi bi-inbox"></i>
-                        لم يتم إضافة أصناف بعد.<br>
-                        <small>ابحث عن صنف بالأعلى واضغط <kbd>Enter</kbd> لإضافته</small>
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="woAddRowBtn">
+                            <i class="bi bi-plus-lg me-1"></i>إضافة صف (F3)
+                        </button>
                     </div>
                 </div>
 
-                <div class="wo-form-row mt-2">
+                <div class="wo-form-row mt-3">
                     <div class="wo-form-col">
-                        <textarea name="notes" id="notes" rows="1" class="form-control form-control-sm @error('notes') is-invalid @enderror" placeholder="ملاحظات إضافية...">{{ old('notes') }}</textarea>
+                        <label for="notes" class="form-label">ملاحظات إضافية (اختياري)</label>
+                        <textarea name="notes" id="notes" rows="2" class="form-control form-control-sm @error('notes') is-invalid @enderror" placeholder="اكتب الملاحظات هنا...">{{ old('notes') }}</textarea>
                         @error('notes') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                 </div>
 
-                <div class="mt-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-sm btn-primary px-3" id="woSaveBtn">
-                        <i class="bi bi-check-lg me-1"></i>حفظ (F12)
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger px-3" id="woClearAll">
-                        <i class="bi bi-trash3 me-1"></i>مسح
+                <div class="mt-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4" id="woSaveBtn">
+                        <i class="bi bi-check-lg me-1"></i>حفظ أمر العمل (F12)
                     </button>
                 </div>
             </div>
         </div>
     </form>
-</div>
-
-{{-- ════════ Shortcuts Modal ════════ --}}
-<div class="modal fade" id="woShortcutsModal" tabindex="-1" aria-labelledby="woShortcutsLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="woShortcutsLabel"><i class="bi bi-keyboard me-2"></i>اختصارات لوحة المفاتيح</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="wo-shortcut-row">
-                    <span>التركيز على البحث</span>
-                    <kbd>F2</kbd>
-                </div>
-                <div class="wo-shortcut-row">
-                    <span>التنقل بين نتائج البحث</span>
-                    <div><kbd>↑</kbd> <kbd>↓</kbd></div>
-                </div>
-                <div class="wo-shortcut-row">
-                    <span>إضافة الصنف المحدد</span>
-                    <kbd>Enter</kbd>
-                </div>
-                <div class="wo-shortcut-row">
-                    <span>إغلاق قائمة البحث</span>
-                    <kbd>Esc</kbd>
-                </div>
-                <div class="wo-shortcut-row">
-                    <span>حذف آخر صنف مضاف</span>
-                    <kbd>Delete</kbd>
-                </div>
-                <div class="wo-shortcut-row">
-                    <span>التنقل بين خانات الكمية</span>
-                    <kbd>Tab</kbd>
-                </div>
-                <div class="wo-shortcut-row">
-                    <span>حفظ أمر العمل</span>
-                    <kbd>Ctrl+S</kbd>
-                </div>
-                <div class="wo-shortcut-row">
-                    <span>فتح هذه النافذة</span>
-                    <kbd>F1</kbd>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-            </div>
-        </div>
-    </div>
 </div>
 
 @endsection
@@ -427,627 +333,230 @@
 (function () {
     'use strict';
 
-    // ── Products data (from server, kept in JS array for fast client-side search) ──
-    var _woProducts = {!! json_encode($products->map(function($p) {
-        return [
-            'id' => $p->id,
-            'name' => $p->name,
-            'sku' => $p->sku ?? '',
-            'price' => (float) $p->unit_price,
-            'category' => $p->category->name ?? '—',
-        ];
+    // Data from Server
+    const _products = {!! json_encode($products->map(function($p) {
+        return ['id' => $p->id, 'name' => $p->name, 'category_id' => $p->category_id];
+    })->values()) !!};
+    
+    const _categories = {!! json_encode($categories->map(function($c) {
+        return ['id' => $c->id, 'name' => $c->name];
     })->values()) !!};
 
-    var _woClients = {!! json_encode($clients->map(function($c) {
-        return [
-            'id' => $c->id,
-            'name' => $c->name,
-        ];
-    })) !!};
+    const _catsAttrsList = {!! json_encode($allCategoryAttributes->pluck('name')) !!};
+    const _itemAttrsList = {!! json_encode($allAttributes->pluck('name')) !!};
 
-    var _allAttributes = {!! json_encode($allAttributes->map(function($a) {
-        return [
-            'id' => $a->id,
-            'name' => $a->name,
-            'type' => $a->type,
-            'options' => $a->options,
-        ];
-    })) !!};
+    // DOM Elements
+    const $detBody = $('#woDetailsBody');
+    const $form = $('#woCreateForm');
 
-    // ── State ──
-    var _woDetails = [];
-    var _woAcIdx = -1;
-    var _woAcVisible = [];
-    var _woClientIdx = -1;
-    var _woClientVisible = [];
+    // Excel-like State
+    let _rowCount = 0;
 
-    // ── DOM Refs ──
-    var $search    = $('#woProductSearch');
-    var $dropdown  = $('#woAcDropdown');
-    var $acBody    = $('#woAcBody');
-    var $acNoRes   = $('#woAcNoResult');
+    // Build Row HTML
+    function buildRowHTML(idx) {
+        let catOptions = '<option value="">— اختر التصنيف —</option>';
+        _categories.forEach(c => { catOptions += `<option value="${c.id}">${c.name}</option>`; });
+        
+        return `
+        <tr data-idx="${idx}" class="wo-item-row">
+            <td>
+                <select class="form-select form-select-sm wo-cat-select" data-idx="${idx}" required>
+                    ${catOptions}
+                </select>
+            </td>
+            <td>
+                <div class="wo-attr-wrap" data-idx="${idx}" data-type="cat">
+                    <div class="wo-attr-list d-flex flex-wrap"></div>
+                    <input type="text" class="wo-attr-input" placeholder="خاصية تصنيف.." data-idx="${idx}" data-type="cat">
+                </div>
+                <div class="wo-hid-cat-attrs" data-idx="${idx}"></div>
+            </td>
+            <td>
+                <select name="details[${idx}][product_id]" class="form-select form-select-sm wo-prod-select" data-idx="${idx}" required disabled>
+                    <option value="">— اختر التصنيف أولاً —</option>
+                </select>
+            </td>
+            <td>
+                <div class="wo-attr-wrap" data-idx="${idx}" data-type="item">
+                    <div class="wo-attr-list d-flex flex-wrap"></div>
+                    <input type="text" class="wo-attr-input" placeholder="خاصية صنف.." data-idx="${idx}" data-type="item">
+                </div>
+                <div class="wo-hid-item-attrs" data-idx="${idx}"></div>
+            </td>
+            <td>
+                <input type="number" step="0.01" min="0.01" name="details[${idx}][quantity]" class="form-control form-control-sm wo-qty-input" data-idx="${idx}" value="1" required>
+            </td>
+            <td class="text-center align-middle">
+                <button type="button" class="btn btn-sm btn-outline-danger btn-remove-row" data-idx="${idx}" title="حذف">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        </tr>`;
+    }
 
-    var $cSearch   = $('#clientSearchInput');
-    var $cHidden   = $('#client_id_hidden');
-    var $cDropdown = $('#woClientDropdown');
-    var $cList     = $('#woClientList');
-    var $cNoRes    = $('#woClientNoResult');
+    // Add Initial Row on Load
+    function addRow() {
+        const html = buildRowHTML(_rowCount);
+        $detBody.append(html);
+        
+        // Add Datalists to the new inputs
+        addDatalist($detBody.find(`.wo-attr-input[data-idx="${_rowCount}"][data-type="cat"]`), _catsAttrsList);
+        addDatalist($detBody.find(`.wo-attr-input[data-idx="${_rowCount}"][data-type="item"]`), _itemAttrsList);
+        
+        _rowCount++;
+    }
 
-    var $detBody   = $('#woDetailsBody');
-    var $detEmpty  = $('#woDetailsEmpty');
-    var $detFoot   = $('#woDetailsFoot');
-    var $grandTot  = $('#woGrandTotal');
-    var $form      = $('#woCreateForm');
+    $('#woAddRowBtn').on('click', function() { addRow(); });
 
-    // ══════════════════════════════════════
-    //  AUTOCOMPLETE: Search & Show Dropdown
-    // ══════════════════════════════════════
-    $search.on('input', function () {
-        var q = $(this).val().toLowerCase().trim();
-        _woAcIdx = -1;
-
-        if (!q) {
-            _woHideDropdown();
+    // Category Change -> Filter Products
+    $detBody.on('change', '.wo-cat-select', function() {
+        const idx = $(this).data('idx');
+        const catId = $(this).val();
+        const $prodSelect = $detBody.find(`.wo-prod-select[data-idx="${idx}"]`);
+        
+        $prodSelect.empty();
+        if (!catId) {
+            $prodSelect.append('<option value="">— اختر التصنيف أولاً —</option>');
+            $prodSelect.prop('disabled', true);
             return;
         }
 
-        // Filter products
-        _woAcVisible = [];
-        for (var i = 0; i < _woProducts.length; i++) {
-            var p = _woProducts[i];
-            var nameMatch = p.name.toLowerCase().indexOf(q) > -1;
-            var skuMatch  = p.sku.toLowerCase().indexOf(q) > -1;
-            if (nameMatch || skuMatch) {
-                _woAcVisible.push(p);
-            }
-        }
-
-        _woRenderDropdown(q);
+        const filtered = _products.filter(p => String(p.category_id) === String(catId));
+        $prodSelect.append('<option value="">— اختر الصنف —</option>');
+        filtered.forEach(p => { $prodSelect.append(`<option value="${p.id}">${p.name}</option>`); });
+        $prodSelect.prop('disabled', false);
     });
 
-    $search.on('focus', function () {
-        var q = $(this).val().trim();
-        if (q && _woAcVisible.length) {
-            $dropdown.addClass('show');
-        }
-    });
-
-    function _woHideDropdown() {
-        $dropdown.removeClass('show');
-        _woAcIdx = -1;
-    }
-
-    // ══════════════════════════════════════
-    //  CLIENT SEARCH LOGIC
-    // ══════════════════════════════════════
-    $cSearch.on('input', function () {
-        var q = $(this).val().toLowerCase().trim();
-        _woClientIdx = -1;
-        $cHidden.val('');
-
-        if (!q) {
-            $cDropdown.removeClass('show');
+    // Remove Row
+    $detBody.on('click', '.btn-remove-row', function() {
+        if ($detBody.find('tr').length <= 1) {
+            alert('يجب أن يحتوي أمر العمل على صنف واحد على الأقل.');
             return;
         }
-
-        _woClientVisible = _woClients.filter(c => c.name.toLowerCase().includes(q));
-        _woRenderClientDropdown();
-    });
-
-    $cSearch.on('focus', function () {
-        if ($(this).val().trim() && _woClientVisible.length) {
-            $cDropdown.addClass('show');
-        }
-    });
-
-    function _woRenderClientDropdown() {
-        $cList.empty();
-        if (!_woClientVisible.length) {
-            $cNoRes.show();
-            $cDropdown.addClass('show');
-            return;
-        }
-        $cNoRes.hide();
-        _woClientVisible.forEach((c, i) => {
-            $cList.append(`<a href="#" class="list-group-item list-group-item-action py-2" data-idx="${i}">${_woEsc(c.name)}</a>`);
-        });
-        _woClientIdx = 0;
-        $cList.find('.list-group-item').first().addClass('active');
-        $cDropdown.addClass('show');
-    }
-
-    $cList.on('click', '.list-group-item', function (e) {
-        e.preventDefault();
-        var idx = $(this).data('idx');
-        _woSelectClient(_woClientVisible[idx]);
-    });
-
-    function _woSelectClient(client) {
-        $cSearch.val(client.name);
-        $cHidden.val(client.id);
-        $cDropdown.removeClass('show');
-        $search.focus();
-    }
-
-    $cSearch.on('keydown', function (e) {
-        if (!$cDropdown.hasClass('show')) return;
-        var $items = $cList.find('.list-group-item');
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            _woClientIdx = Math.min(_woClientIdx + 1, $items.length - 1);
-            _woHighlightClient($items);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            _woClientIdx = Math.max(_woClientIdx - 1, 0);
-            _woHighlightClient($items);
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (_woClientIdx >= 0) _woSelectClient(_woClientVisible[_woClientIdx]);
-        } else if (e.key === 'Escape') {
-            $cDropdown.removeClass('show');
-        }
-    });
-
-    function _woHighlightClient($items) {
-        $items.removeClass('active');
-        var $target = $items.eq(_woClientIdx);
-        $target.addClass('active');
-        $target[0].scrollIntoView({ block: 'nearest' });
-    }
-
-    $(document).on('mousedown', function (e) {
-        if (!$(e.target).closest('#clientSearchWrap').length) $cDropdown.removeClass('show');
-        if (!$(e.target).closest('.wo-ac-wrap').length) _woHideDropdown();
-    });
-
-    function _woRenderDropdown(query) {
-        $acBody.empty();
-
-        if (!_woAcVisible.length) {
-            $acNoRes.show();
-            $dropdown.addClass('show');
-            return;
-        }
-
-        $acNoRes.hide();
-
-        for (var i = 0; i < _woAcVisible.length; i++) {
-            var p = _woAcVisible[i];
-            // Check if already added
-            var added = _woIsAdded(p.id);
-            var cls = added ? ' class="text-muted opacity-75"' : '';
-            var badge = added ? ' <span class="badge bg-success bg-opacity-10 text-success ms-1" style="font-size:0.65rem">مضاف مسبقاً</span>' : '';
-
-            var displayName = _woEsc(p.name);
-            var displaySku  = _woEsc(p.sku);
-
-            var row = '<tr data-acid="' + i + '"' + cls + '>' +
-                '<td>' +
-                    '<div class="d-flex align-items-center">' +
-                        '<div class="flex-grow-1">' +
-                            '<div class="fw-bold text-dark mb-0">' + displayName + badge + '</div>' +
-                        '</div>' +
-                    '</div>' +
-                '</td>' +
-                '<td><code class="text-primary">' + displaySku + '</code></td>' +
-                '<td class="text-muted">' + _woEsc(p.category) + '</td>' +
-                '<td class="text-end fw-bold text-primary">' + p.price.toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
-                '</tr>';
-            $acBody.append(row);
-        }
-
-        // Auto-highlight first
-        $acBody.find('tr').first().addClass('wo-ac-active');
-        _woAcIdx = 0;
-
-        $dropdown.addClass('show');
-    }
-
-    function _woHideDropdown() {
-        $dropdown.removeClass('show');
-        _woAcIdx = -1;
-    }
-
-    function _woIsAdded(pid) {
-        for (var i = 0; i < _woDetails.length; i++) {
-            if (_woDetails[i].pid === pid) return true;
-        }
-        return false;
-    }
-
-    // ══════════════════════════════════════
-    //  AUTOCOMPLETE: Click to add
-    // ══════════════════════════════════════
-    $acBody.on('click', 'tr', function () {
-        var idx = parseInt($(this).data('acid'));
-        _woAddProduct(_woAcVisible[idx]);
-    });
-
-    // ══════════════════════════════════════
-    //  AUTOCOMPLETE: Keyboard navigation
-    // ══════════════════════════════════════
-    $search.on('keydown', function (e) {
-        if (!$dropdown.hasClass('show')) {
-            // If typing Enter with no dropdown, do nothing (don't submit form)
-            if (e.key === 'Enter') e.preventDefault();
-            return;
-        }
-
-        var $rows = $acBody.find('tr');
-        if (!$rows.length) return;
-
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            _woAcIdx = Math.min(_woAcIdx + 1, $rows.length - 1);
-            _woHighlightAc($rows);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            _woAcIdx = Math.max(_woAcIdx - 1, 0);
-            _woHighlightAc($rows);
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (_woAcIdx >= 0 && _woAcIdx < _woAcVisible.length) {
-                _woAddProduct(_woAcVisible[_woAcIdx]);
-            }
-        } else if (e.key === 'Escape') {
-            e.preventDefault();
-            _woHideDropdown();
-        }
-    });
-
-    function _woHighlightAc($rows) {
-        $rows.removeClass('wo-ac-active');
-        var $target = $rows.eq(_woAcIdx);
-        $target.addClass('wo-ac-active');
-        // Scroll into view
-        var dd = $dropdown[0];
-        var row = $target[0];
-        if (row && dd) {
-            var rowTop = row.offsetTop;
-            var rowH   = row.offsetHeight;
-            var ddScroll = dd.scrollTop;
-            var ddH     = dd.clientHeight;
-            if (rowTop < ddScroll) dd.scrollTop = rowTop;
-            else if (rowTop + rowH > ddScroll + ddH) dd.scrollTop = rowTop + rowH - ddH;
-        }
-    }
-
-    // ══════════════════════════════════════
-    //  ADD PRODUCT TO DETAILS
-    // ══════════════════════════════════════
-    function _woAddProduct(product) {
-        if (!product) return;
-
-        // Check duplicate → focus existing qty
-        for (var i = 0; i < _woDetails.length; i++) {
-            if (_woDetails[i].pid === product.id) {
-                $('#woQty_' + product.id).select().focus();
-                $search.val('');
-                _woHideDropdown();
-                return;
-            }
-        }
-
-        _woDetails.push({
-            pid:      product.id,
-            name:     product.name,
-            sku:      product.sku || '',
-            category: product.category || '—',
-            qty:      1,
-            price:    product.price || 0,
-            attributes: []
-        });
-
-        _woRenderDetails();
-
-        // Clear search, hide dropdown, then focus qty
-        $search.val('');
-        _woHideDropdown();
-        setTimeout(function () { $('#woQty_' + product.id).select().focus(); }, 50);
-    }
-
-    // ══════════════════════════════════════
-    //  RENDER DETAILS TABLE
-    // ══════════════════════════════════════
-    function _woRenderDetails() {
-        $detBody.empty();
-
-        if (!_woDetails.length) {
-            $detEmpty.show();
-            $detFoot.hide();
-            $grandTot.text('0.00');
-            return;
-        }
-
-        $detEmpty.hide();
-        $detFoot.show();
-        var grand = 0;
-
-        for (var i = 0; i < _woDetails.length; i++) {
-            var d = _woDetails[i];
-            var lineTotal = (d.qty * d.price).toFixed(2);
-            grand += parseFloat(lineTotal);
-
-            var html = '<tr data-idx="' + i + '">' +
-                '<td>' + (i + 1) + '</td>' +
-                '<td><strong>' + _woEsc(d.name) + '</strong> <small class="text-muted d-block">' + _woEsc(d.sku) + '</small></td>' +
-                '<td class="text-muted">' + _woEsc(d.category) + '</td>' +
-                '<td>' +
-                    '<div class="wo-attr-wrap" data-idx="' + i + '">' +
-                        '<div class="wo-attr-list d-flex flex-wrap"></div>' +
-                        '<input type="text" class="wo-attr-input" placeholder="أضف خاصية..." data-idx="' + i + '">' +
-                    '</div>' +
-                '</td>' +
-                '<td><input type="number" step="0.01" min="0.01" class="form-control form-control-sm qty-input wo-detail-qty" ' +
-                    'id="woQty_' + d.pid + '" value="' + d.qty + '" data-idx="' + i + '"></td>' +
-                '<td><input type="number" step="0.01" min="0" class="form-control form-control-sm price-input wo-detail-price" ' +
-                    'value="' + d.price.toFixed(2) + '" data-idx="' + i + '"></td>' +
-                '<td class="fw-semibold wo-line-total">' + lineTotal + '</td>' +
-                '<td class="text-center align-middle">' +
-                    '<button type="button" class="btn btn-sm btn-outline-danger wo-remove-row" data-idx="' + i + '" title="حذف">' +
-                    '<i class="bi bi-x-lg"></i></button>' +
-                    '<div class="wo-hid-attrs" data-idx="' + i + '"></div>' +
-                '</td>' +
-                '<input type="hidden" name="details[' + i + '][product_id]" value="' + d.pid + '">' +
-                '<input type="hidden" name="details[' + i + '][quantity]" value="' + d.qty + '" class="wo-hid-qty" data-idx="' + i + '">' +
-                '<input type="hidden" name="details[' + i + '][unit_price]" value="' + d.price.toFixed(2) + '" class="wo-hid-price" data-idx="' + i + '">' +
-                '</tr>';
-            $detBody.append(html);
-            _woRenderRowAttributes(i);
-        }
-
-        $grandTot.text(grand.toFixed(2));
-    }
-
-    // ══════════════════════════════════════
-    //  LIVE QTY / PRICE EDIT
-    // ══════════════════════════════════════
-    $detBody.on('input', '.wo-detail-qty', function () {
-        var idx = parseInt($(this).data('idx'));
-        var val = parseFloat($(this).val()) || 0;
-        _woDetails[idx].qty = val;
-        _woRecalcRow(idx);
-    });
-
-    $detBody.on('input', '.wo-detail-price', function () {
-        var idx = parseInt($(this).data('idx'));
-        var val = parseFloat($(this).val()) || 0;
-        _woDetails[idx].price = val;
-        _woRecalcRow(idx);
-    });
-
-    $detBody.on('keydown', '.wo-detail-qty', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            $(this).closest('tr').find('.wo-detail-price').focus().select();
-        }
-    });
-
-    $detBody.on('keydown', '.wo-detail-price', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            $search.focus();
-        }
-    });
-
-    function _woRecalcRow(idx) {
-        var d = _woDetails[idx];
-        var lineTotal = (d.qty * d.price).toFixed(2);
-        $detBody.find('tr[data-idx="' + idx + '"] .wo-line-total').text(lineTotal);
-        $detBody.find('.wo-hid-qty[data-idx="' + idx + '"]').val(d.qty);
-        $detBody.find('.wo-hid-price[data-idx="' + idx + '"]').val(d.price.toFixed(2));
-        _woRecalcGrand();
-    }
-
-    function _woRecalcGrand() {
-        var g = 0;
-        for (var i = 0; i < _woDetails.length; i++) {
-            g += _woDetails[i].qty * _woDetails[i].price;
-        }
-        $grandTot.text(g.toFixed(2));
-    }
-
-    // ══════════════════════════════════════
-    //  REMOVE ROW
-    // ══════════════════════════════════════
-    $detBody.on('click', '.wo-remove-row', function () {
-        var idx = parseInt($(this).data('idx'));
-        _woDetails.splice(idx, 1);
-        _woRenderDetails();
-    });
-
-    // ══════════════════════════════════════
-    //  CLEAR ALL
-    // ══════════════════════════════════════
-    $('#woClearAll').on('click', function () {
-        if (_woDetails.length && !confirm('هل تريد مسح كل الأصناف؟')) return;
-        _woDetails = [];
-        _woRenderDetails();
-        $search.val('').focus();
+        $(this).closest('tr').remove();
     });
 
     // ── Attributes Logic ──
-    function _woRenderRowAttributes(idx) {
-        var d = _woDetails[idx];
-        var $row = $detBody.find('tr[data-idx="' + idx + '"]');
-        if (!$row.length) return;
-        
-        var $list = $row.find('.wo-attr-list');
-        var $hiddens = $row.find('.wo-hid-attrs');
+    const _rowAttrs = {}; 
+    // _rowAttrs[idx] = { cat: [], item: [] }
+
+    function renderAttributes(idx, type) {
+        if (!_rowAttrs[idx]) _rowAttrs[idx] = { cat: [], item: [] };
+        const arr = _rowAttrs[idx][type];
+        const $row = $detBody.find(`tr[data-idx="${idx}"]`);
+        const $list = $row.find(`.wo-attr-wrap[data-type="${type}"] .wo-attr-list`);
+        const $hiddens = $row.find(type === 'cat' ? '.wo-hid-cat-attrs' : '.wo-hid-item-attrs');
         
         $list.empty();
         $hiddens.empty();
         
-        if (!d.attributes || !Array.isArray(d.attributes)) d.attributes = [];
-        
-        d.attributes.forEach((attr, aIdx) => {
-            var name = attr.name || '';
-            var value = attr.value || '';
-            var displayText = name + (value ? ': ' + value : '');
-            $list.append(
-                '<div class="wo-attr-badge">' + 
-                    '<i class="bi bi-trash remove" data-idx="' + idx + '" data-aidx="' + aIdx + '" title="حذف"></i>' + 
-                    _woEsc(displayText) + 
-                '</div>'
-            );
-            $hiddens.append('<input type="hidden" name="details[' + idx + '][attributes][' + aIdx + '][name]" value="' + _woEsc(name) + '">');
-            $hiddens.append('<input type="hidden" name="details[' + idx + '][attributes][' + aIdx + '][value]" value="' + _woEsc(value) + '">');
+        const typeKey = type === 'cat' ? 'category_attributes' : 'attributes';
+
+        arr.forEach((attr, aIdx) => {
+            const name = attr.name || '';
+            const value = attr.value || '';
+            const disp = name + (value ? ': ' + value : '');
+            
+            $list.append(`
+                <div class="wo-attr-badge">
+                    <i class="bi bi-trash remove-attr" data-idx="${idx}" data-type="${type}" data-aidx="${aIdx}"></i>
+                    ${disp.replace(/</g, "&lt;")}
+                </div>
+            `);
+            
+            $hiddens.append(`<input type="hidden" name="details[${idx}][${typeKey}][${aIdx}][name]" value="${name.replace(/"/g, '&quot;')}">`);
+            $hiddens.append(`<input type="hidden" name="details[${idx}][${typeKey}][${aIdx}][value]" value="${value.replace(/"/g, '&quot;')}">`);
         });
     }
-
-    $detBody.on('click', '.wo-attr-badge .remove', function() {
-        var idx = $(this).data('idx');
-        var aidx = $(this).data('aidx');
-        _woDetails[idx].attributes.splice(aidx, 1);
-        _woRenderRowAttributes(idx);
-    });
 
     $detBody.on('keydown', '.wo-attr-input', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            var val = $(this).val().trim();
+            const val = $(this).val().trim();
             if (!val) return;
             
-            var idx = $(this).data('idx');
-            var parts = val.split(':');
-            var name = parts[0].trim();
-            var value = parts.length > 1 ? parts.slice(1).join(':').trim() : '';
+            const idx = $(this).data('idx');
+            const type = $(this).data('type');
+            const parts = val.split(':');
+            const name = parts[0].trim();
+            const value = parts.length > 1 ? parts.slice(1).join(':').trim() : '';
             
             if (name) {
-                // Check if already exists in this row
-                var existing = _woDetails[idx].attributes.find(a => a.name.toLowerCase() === name.toLowerCase());
-                if (existing) {
-                    existing.value = value;
-                } else {
-                    _woDetails[idx].attributes.push({ name: name, value: value });
-                }
+                if (!_rowAttrs[idx]) _rowAttrs[idx] = { cat: [], item: [] };
+                _rowAttrs[idx][type].push({ name, value });
                 $(this).val('');
-                _woRenderRowAttributes(idx);
+                renderAttributes(idx, type);
             }
         }
     });
 
-    // Provide autocomplete suggestions for attribute names
-    $detBody.on('focus', '.wo-attr-input', function() {
-        var $input = $(this);
-        if (!$input.attr('list')) {
-            var listId = 'attr_list_' + Math.random().toString(36).substr(2, 9);
-            $input.attr('list', listId);
-            var $datalist = $('<datalist id="' + listId + '"></datalist>');
-            _allAttributes.forEach(attr => {
-                $datalist.append('<option value="' + _woEsc(attr.name) + ': ">');
-            });
-            $input.after($datalist);
-        }
+    $detBody.on('click', '.remove-attr', function() {
+        const idx = $(this).data('idx');
+        const type = $(this).data('type');
+        const aidx = $(this).data('aidx');
+        _rowAttrs[idx][type].splice(aidx, 1);
+        renderAttributes(idx, type);
     });
 
-    // ══════════════════════════════════════
-    //  KEYBOARD SHORTCUTS (Global)
-    // ══════════════════════════════════════
-    $(document).on('keydown', function (e) {
-        // F1 → Open shortcuts modal
-        if (e.key === 'F1') {
-            e.preventDefault();
-            var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('woShortcutsModal'));
-            modal.toggle();
-        }
-
-        // F2 → Focus search
-        if (e.key === 'F2') {
-            e.preventDefault();
-            $search.focus().select();
-        }
-
-        // F12 → Submit form
-        if (e.key === 'F12') {
-            e.preventDefault();
-            if (_woDetails.length) {
-                $form.submit();
-            }
-        }
-
-        // Delete → Remove last item (only when not inside input)
-        if (e.key === 'Delete' && !$(e.target).is('input, textarea, select')) {
-            e.preventDefault();
-            if (_woDetails.length) {
-                _woDetails.pop();
-                _woRenderDetails();
-            }
-        }
-    });
-
-    // Tab/Enter between qty inputs or back to search
-    $detBody.on('keydown', '.wo-detail-qty', function (e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            $search.focus().select();
-        }
-        
-        if (e.key === 'Tab' && !e.shiftKey) {
-            var idx = parseInt($(this).data('idx'));
-            var $nextQty = $detBody.find('.wo-detail-qty[data-idx="' + (idx + 1) + '"]');
-            if ($nextQty.length) {
-                e.preventDefault();
-                $nextQty.select().focus();
-            }
-        }
-    });
-
-    // ══════════════════════════════════════
-    //  FORM VALIDATION
-    // ══════════════════════════════════════
-    $form.on('submit', function (e) {
-        var errors = [];
-        
-        // 1. Validate Client
-        if (!$cHidden.val()) {
-            errors.push('يجب اختيار عميل أولاً.');
-            $cSearch.addClass('is-invalid');
-        } else {
-            $cSearch.removeClass('is-invalid');
-        }
-
-        // 2. Validate Products Presence
-        if (!_woDetails.length) {
-            errors.push('يجب إضافة صنف واحد على الأقل لأمر العمل.');
-            $search.addClass('is-invalid').focus();
-        } else {
-            $search.removeClass('is-invalid');
-        }
-
-        // 3. Validate Quantities and Prices
-        $('.wo-detail-qty').each(function() {
-            if (parseFloat($(this).val()) <= 0 || !$(this).val()) {
-                $(this).addClass('is-invalid');
-                if (errors.indexOf('يرجى التأكد من أن جميع الكميات أكبر من صفر.') === -1) {
-                    errors.push('يرجى التأكد من أن جميع الكميات أكبر من صفر.');
-                }
-            } else {
-                $(this).removeClass('is-invalid');
-            }
-        });
-
-        if (errors.length > 0) {
-            e.preventDefault();
-            
-            // Show errors in an alert (or you can use a toast if available)
-            // For now, let's use a simple but clear alert
-            alert(errors.join('\n'));
-            
-            return false;
-        }
-
-        // Disable save button to prevent double submit
-        $('#woSaveBtn').prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i>جاري الحفظ...');
-    });
-
-    // ══════════════════════════════════════
-    //  UTILITIES
-    // ══════════════════════════════════════
-    function _woEsc(str) {
-        if (!str) return '';
-        return $('<span>').text(str).html();
+    function addDatalist($el, list) {
+        const rId = 'dl_' + Math.random().toString(36).substr(2, 9);
+        $el.attr('list', rId);
+        let $dl = $(`<datalist id="${rId}"></datalist>`);
+        list.forEach(item => { $dl.append(`<option value="${item}: ">`); });
+        $el.after($dl);
     }
+
+    // ── Keyboard Shortcuts ──
+    $(document).on('keydown', function(e) {
+        if (e.key === 'F3') { e.preventDefault(); addRow(); }
+        if (e.key === 'F12') { 
+            e.preventDefault(); 
+            if ($detBody.find('tr').length) $form.submit(); 
+        }
+    });
+
+    // Handle Client Search Autocomplete (Legacy logic)
+    const _clients = {!! json_encode($clients->map(fn($c) => ['id'=>$c->id,'name'=>$c->name])) !!};
+    const $cSearch = $('#clientSearchInput');
+    const $cHidden = $('#client_id_hidden');
+    const $cDropdown = $('#woClientDropdown');
+    const $cList = $('#woClientList');
+
+    $cSearch.on('input', function() {
+        const q = $(this).val().toLowerCase().trim();
+        $cHidden.val('');
+        if (!q) { $cDropdown.removeClass('show'); return; }
+        
+        const res = _clients.filter(c => c.name.toLowerCase().includes(q));
+        $cList.empty();
+        if(!res.length) { $cDropdown.removeClass('show'); return; }
+        
+        res.forEach((c, i) => { $cList.append(`<a href="#" class="list-group-item list-group-item-action py-2" data-idx="${i}" data-id="${c.id}">${c.name}</a>`); });
+        $cDropdown.addClass('show');
+    });
+
+    $cList.on('click', '.list-group-item', function(e) {
+        e.preventDefault();
+        $cSearch.val($(this).text());
+        $cHidden.val($(this).data('id'));
+        $cDropdown.removeClass('show');
+    });
+
+    $(document).on('mousedown', function(e) {
+        if (!$(e.target).closest('#clientSearchWrap').length) $cDropdown.removeClass('show');
+    });
+
+    // Form Validation simple
+    $form.on('submit', function(e) {
+        if (!$cHidden.val()) {
+            e.preventDefault();
+            alert('يجب اختيار العميل!');
+            $cSearch.focus();
+        }
+    });
+
+    // Init first row!
+    addRow();
 
 })();
 </script>

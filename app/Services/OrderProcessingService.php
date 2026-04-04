@@ -86,6 +86,7 @@ class OrderProcessingService
                     'quantity' => $detail['quantity'],
                     'unit_price' => $detail['unit_price'],
                     'total_price' => $lineTotal,
+                    'category_attributes' => $detail['category_attributes'] ?? [],
                     'attributes' => $detail['attributes'] ?? [],
                 ]);
                 $grandTotal += $lineTotal;
@@ -135,6 +136,7 @@ class OrderProcessingService
                     'quantity' => $detail['quantity'],
                     'unit_price' => $detail['unit_price'],
                     'total_price' => $lineTotal,
+                    'category_attributes' => $detail['category_attributes'] ?? [],
                     'attributes' => $detail['attributes'] ?? [],
                 ]);
                 $grandTotal += $lineTotal;
