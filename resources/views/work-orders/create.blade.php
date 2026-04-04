@@ -4,7 +4,23 @@
 @section('page-title', 'إضافة أمر عمل')
 
 @push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
+    /* Select2 Bootstrap 5 Theme overrides */
+    .select2-container .select2-selection--single {
+        height: 31px;
+        padding: 0.15rem 0.5rem;
+        font-size: 0.875rem;
+        border-radius: 0.25rem;
+        border: 1px solid #ced4da;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 29px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: normal;
+        padding-right: 0;
+    }
     /* ── Fixed Width Container ── */
     .wo-container {
         width: 100%;
@@ -329,6 +345,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 (function () {
     'use strict';
@@ -403,6 +420,10 @@
         addDatalist($detBody.find(`.wo-attr-input[data-idx="${_rowCount}"][data-type="cat"]`), _catsAttrsList);
         addDatalist($detBody.find(`.wo-attr-input[data-idx="${_rowCount}"][data-type="item"]`), _itemAttrsList);
         
+        // Initialize Select2
+        $detBody.find(`.wo-cat-select[data-idx="${_rowCount}"]`).select2({ width: '100%' });
+        $detBody.find(`.wo-prod-select[data-idx="${_rowCount}"]`).select2({ width: '100%' });
+        
         _rowCount++;
     }
 
@@ -424,7 +445,7 @@
         const filtered = _products.filter(p => String(p.category_id) === String(catId));
         $prodSelect.append('<option value="">— اختر الصنف —</option>');
         filtered.forEach(p => { $prodSelect.append(`<option value="${p.id}">${p.name}</option>`); });
-        $prodSelect.prop('disabled', false);
+        $prodSelect.prop('disabled', false).trigger('change.select2');
     });
 
     // Remove Row

@@ -6,16 +6,22 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', sans-serif; font-size: 13pt; background: #fff; color: #222; padding: 2rem; }
-        .print-header { text-align: center; margin-bottom: 2rem; border-bottom: 2px solid #333; padding-bottom: 1rem; }
-        .print-header h2 { margin: 0; font-weight: 700; }
-        .print-header p { margin: 0.25rem 0 0; opacity: 0.7; font-size: 11pt; }
-        .info-table td { padding: 0.3rem 0.75rem; }
-        .info-table .label { font-weight: 600; width: 140px; }
-        .section-title { font-weight: 700; font-size: 14pt; margin: 1.5rem 0 0.5rem; border-bottom: 1px solid #ccc; padding-bottom: 0.25rem; }
-        .items-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        .items-table th, .items-table td { border: 1px solid #ddd; padding: 0.5rem; text-align: center; }
-        .items-table th { background-color: #f8f9fa; }
+        @page { margin: 0; size: 75mm auto; }
+        body { font-family: 'Cairo', sans-serif; font-size: 12pt; font-weight: 600; background: #fff; color: #000; margin: 0 auto; padding: 15px; width: 75mm; max-width: 75mm; box-sizing: border-box; }
+        .print-header { text-align: center; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 10px; }
+        .print-header h2 { margin: 0; font-size: 16pt; font-weight: 700; }
+        .print-header p { margin: 2px 0 0; font-size: 11pt; }
+        .info-table { width: 100%; font-size: 11pt; margin-bottom: 10px; border: none; }
+        .info-table td { padding: 2px 0; border: none; }
+        .info-table .label { font-weight: 700; width: 45%; }
+        .section-title { font-weight: 700; font-size: 13pt; margin: 10px 0 5px; border-bottom: 1px dashed #000; padding-bottom: 2px; text-align: center; }
+        
+        .items-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 11pt; }
+        .items-table th { border-bottom: 1px dashed #000; padding: 3px 0; text-align: right; font-weight: 700; }
+        .items-table td { padding: 5px 0; text-align: right; vertical-align: top; border-bottom: 1px dotted #999; line-height: 1.4; }
+        .items-table .qty-col { text-align: center; width: 40px; font-weight: bold; }
+        .items-table .attr-text { font-size: 9pt; color: #444; display: block; }
+        
         @media print {
             body { padding: 0; }
             .no-print { display: none !important; }
@@ -54,32 +60,40 @@
 <table class="items-table">
     <thead>
         <tr>
-            <th>#</th>
-            <th>الصنف</th>
-            <th>التصنيف</th>
-            <th>الكمية</th>
-            <th>سعر الوحدة</th>
-            <th>الإجمالي</th>
+            <th>الصنف / التصنيف</th>
+            <th class="qty-col">الكمية</th>
         </tr>
     </thead>
     <tbody>
         @foreach($workOrder->details as $index => $detail)
             <tr>
-                <td>{{ $index + 1 }}</td>
-                <td>{{ $detail->product->name ?? '—' }}</td>
-                <td>{{ $detail->product->category->name ?? '—' }}</td>
-                <td>{{ number_format((float)$detail->quantity, 2) }}</td>
-                <td>{{ number_format((float)$detail->unit_price, 2) }}</td>
-                <td>{{ number_format((float)$detail->total_price, 2) }}</td>
+                <td>
+                    <strong>{{ $detail->product->name ?? '—' }}</strong><br>
+                    <span style="font-size: 10pt; color: #222;">[{{ $detail->product->category->name ?? '—' }}]</span>
+                    
+                    @if(!empty($detail->attributes) || !empty($detail->category_attributes))
+                        <div class="attr-text" style="margin-top: 3px;">
+                        @if($detail->category_attributes)
+                            @foreach($detail->category_attributes as $attr)
+                                {{ $attr['name'] ?? '' }}{{ !empty($attr['value']) ? ': ' . $attr['value'] : '' }} | 
+                            @endforeach
+                        @endif
+                        @if($detail->attributes)
+                            @foreach($detail->attributes as $attr)
+                                {{ $attr['name'] ?? '' }}{{ !empty($attr['value']) ? ': ' . $attr['value'] : '' }} | 
+                            @endforeach
+                        @endif
+                        </div>
+                    @endif
+                </td>
+                <td class="qty-col align-middle">{{ number_format((float)$detail->quantity, 2) }}</td>
             </tr>
         @endforeach
     </tbody>
     <tfoot>
-        <tr class="fw-bold">
-            <td colspan="3" class="text-end">الإجمالي الكلي:</td>
-            <td>{{ number_format($workOrder->details->sum('quantity'), 2) }}</td>
-            <td>—</td>
-            <td>{{ number_format($workOrder->total_price, 2) }}</td>
+        <tr>
+            <td style="border-bottom: none; border-top: 1px dashed #000; padding-top: 5px;" class="fw-bold fs-6">الإجمالي:</td>
+            <td style="border-bottom: none; border-top: 1px dashed #000; padding-top: 5px;" class="qty-col fs-6">{{ number_format($workOrder->details->sum('quantity'), 2) }}</td>
         </tr>
     </tfoot>
 </table>
@@ -89,9 +103,9 @@
     <p>{{ $workOrder->notes }}</p>
 @endif
 
-<div style="margin-top: 3rem; display: flex; justify-content: space-between;">
-    <div style="text-align: center; width: 200px;"><div style="border-top: 1px solid #999; padding-top: 0.5rem;">توقيع المسؤول</div></div>
-    <div style="text-align: center; width: 200px;"><div style="border-top: 1px solid #999; padding-top: 0.5rem;">توقيع العميل</div></div>
+<div style="margin-top: 30px; text-align: center; border-top: 1px dashed #000; padding-top: 10px; font-size: 11pt;">
+    <p style="margin: 0;">توقيع المسؤول: .......................</p>
+    <p style="margin: 5px 0 0;">توقيع العميل: .......................</p>
 </div>
     </div>
 </template>

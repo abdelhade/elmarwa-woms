@@ -6,13 +6,22 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', sans-serif; font-size: 13pt; background: #fff; color: #222; padding: 2rem; }
-        .print-header { text-align: center; margin-bottom: 2rem; border-bottom: 2px solid #333; padding-bottom: 1rem; }
-        .print-header h2 { margin: 0; font-weight: 700; }
-        .print-header p { margin: 0.25rem 0 0; opacity: 0.7; font-size: 11pt; }
-        .info-table td { padding: 0.3rem 0.75rem; }
-        .info-table .label { font-weight: 600; width: 140px; }
-        .section-title { font-weight: 700; font-size: 14pt; margin: 1.5rem 0 0.5rem; border-bottom: 1px solid #ccc; padding-bottom: 0.25rem; }
+        @page { margin: 0; size: 80mm auto; }
+        body { font-family: 'Cairo', sans-serif; font-size: 12pt; font-weight: 600; background: #fff; color: #000; margin: 0 auto; padding: 10px; width: 80mm; max-width: 80mm; box-sizing: border-box; }
+        .print-header { text-align: center; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 10px; }
+        .print-header h2 { margin: 0; font-size: 16pt; font-weight: 700; }
+        .print-header p { margin: 2px 0 0; font-size: 11pt; }
+        .info-table { width: 100%; font-size: 11pt; margin-bottom: 10px; border: none !important; }
+        .info-table td { padding: 2px 0; border: none !important; }
+        .info-table .label { font-weight: 700; width: 45%; }
+        .section-title { font-weight: 700; font-size: 13pt; margin: 10px 0 5px; border-bottom: 1px dashed #000; padding-bottom: 2px; text-align: center; }
+        
+        .items-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 11pt; }
+        .items-table th { border-bottom: 1px dashed #000; padding: 3px 0; text-align: right; font-weight: 700; }
+        .items-table td { padding: 5px 0; text-align: right; vertical-align: top; border-bottom: 1px dotted #999; line-height: 1.4; }
+        .items-table .qty-col { text-align: center; width: 40px; font-weight: bold; }
+        .items-table .attr-text { font-size: 9pt; color: #444; display: block; }
+        
         @media print {
             body { padding: 0; }
             .no-print { display: none !important; }
@@ -43,17 +52,50 @@
 <table class="info-table">
     <tr><td class="label">رقم الأمر:</td><td>{{ $workOrder->order_number }}</td></tr>
     <tr><td class="label">العميل:</td><td>{{ $workOrder->client->name ?? '—' }}</td></tr>
-    <tr><td class="label">المنتج:</td><td>{{ $workOrder->product->name ?? '—' }}</td></tr>
-    <tr><td class="label">التصنيف:</td><td>{{ $workOrder->product->category->name ?? '—' }}</td></tr>
     <tr><td class="label">الحالة:</td><td>{{ $workOrder->status->label() }}</td></tr>
+    <tr><td class="label">تاريخ التسليم:</td><td>{{ $workOrder->due_date?->format('d/m/Y') ?? '—' }}</td></tr>
 </table>
 
-<div class="section-title">التفاصيل المالية</div>
-<table class="info-table">
-    <tr><td class="label">الكمية:</td><td>{{ number_format((float)$workOrder->quantity, 2) }}</td></tr>
-    <tr><td class="label">سعر الوحدة:</td><td>{{ number_format((float)$workOrder->unit_price, 2) }}</td></tr>
-    <tr><td class="label">الإجمالي:</td><td><strong>{{ number_format((float)$workOrder->total_price, 2) }}</strong></td></tr>
-    <tr><td class="label">تاريخ التسليم:</td><td>{{ $workOrder->due_date?->format('d/m/Y') ?? '—' }}</td></tr>
+<div class="section-title">أصناف الأمر</div>
+<table class="items-table">
+    <thead>
+        <tr>
+            <th>الصنف / التصنيف</th>
+            <th class="qty-col">الكمية</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($workOrder->details as $index => $detail)
+            <tr>
+                <td>
+                    <strong>{{ $detail->product->name ?? '—' }}</strong><br>
+                    <span style="font-size: 10pt; color: #222;">[{{ $detail->product->category->name ?? '—' }}]</span>
+                    
+                    @if(!empty($detail->attributes) || !empty($detail->category_attributes))
+                        <div class="attr-text" style="margin-top: 3px;">
+                        @if($detail->category_attributes)
+                            @foreach($detail->category_attributes as $attr)
+                                {{ $attr['name'] ?? '' }}{{ !empty($attr['value']) ? ': ' . $attr['value'] : '' }} | 
+                            @endforeach
+                        @endif
+                        @if($detail->attributes)
+                            @foreach($detail->attributes as $attr)
+                                {{ $attr['name'] ?? '' }}{{ !empty($attr['value']) ? ': ' . $attr['value'] : '' }} | 
+                            @endforeach
+                        @endif
+                        </div>
+                    @endif
+                </td>
+                <td class="qty-col align-middle">{{ number_format((float)$detail->quantity, 2) }}</td>
+            </tr>
+        @endforeach
+    </tbody>
+    <tfoot>
+        <tr>
+            <td style="border-bottom: none; border-top: 1px dashed #000; padding-top: 5px;" class="fw-bold fs-6">الإجمالي:</td>
+            <td style="border-bottom: none; border-top: 1px dashed #000; padding-top: 5px;" class="qty-col fs-6">{{ number_format($workOrder->details->sum('quantity'), 2) }}</td>
+        </tr>
+    </tfoot>
 </table>
 
 @if($workOrder->notes)
@@ -66,9 +108,9 @@
     <p>{{ $workOrder->orderBatch->name }} ({{ $workOrder->orderBatch->batch_number }})</p>
 @endif
 
-<div style="margin-top: 3rem; display: flex; justify-content: space-between;">
-    <div style="text-align: center; width: 200px;"><div style="border-top: 1px solid #999; padding-top: 0.5rem;">توقيع المسؤول</div></div>
-    <div style="text-align: center; width: 200px;"><div style="border-top: 1px solid #999; padding-top: 0.5rem;">توقيع العميل</div></div>
+<div style="margin-top: 30px; text-align: center; border-top: 1px dashed #000; padding-top: 10px; font-size: 11pt;">
+    <p style="margin: 0;">توقيع المسؤول: .......................</p>
+    <p style="margin: 5px 0 0;">توقيع العميل: .......................</p>
 </div>
     </div>
 </template>

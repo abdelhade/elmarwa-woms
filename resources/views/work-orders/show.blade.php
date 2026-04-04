@@ -26,8 +26,6 @@
                 <div class="detail-row"><span class="detail-label">رقم الأمر</span><span class="detail-value fw-bold">{{ $workOrder->order_number }}</span></div>
                 <div class="detail-row"><span class="detail-label">الحالة</span><span class="detail-value"><span class="badge badge-{{ $workOrder->status->value }} rounded-pill px-2 py-1">{{ $workOrder->status->label() }}</span></span></div>
                 <div class="detail-row"><span class="detail-label">العميل</span><span class="detail-value"><a href="{{ route('clients.show', $workOrder->client_id) }}">{{ $workOrder->client->name ?? '—' }}</a></span></div>
-                <div class="detail-row"><span class="detail-label">المنتج</span><span class="detail-value"><a href="{{ route('products.show', $workOrder->product_id) }}">{{ $workOrder->product->name ?? '—' }}</a></span></div>
-                <div class="detail-row"><span class="detail-label">التصنيف</span><span class="detail-value">{{ $workOrder->product->category->name ?? '—' }}</span></div>
                 <div class="detail-row"><span class="detail-label">الموظف</span><span class="detail-value">{{ $workOrder->employee->name ?? '—' }}</span></div>
                 <div class="detail-row"><span class="detail-label">المشغل</span><span class="detail-value">{{ $workOrder->operator->name ?? '—' }}</span></div>
                 <div class="detail-row"><span class="detail-label">مسؤول التشغيل</span><span class="detail-value">{{ $workOrder->supervisor->name ?? '—' }}</span></div>
@@ -36,11 +34,9 @@
     </div>
     <div class="col-lg-6">
         <div class="card detail-card">
-            <div class="card-header">التفاصيل المالية</div>
+            <div class="card-header">تفاصيل الكميات وتواريخ الأمر</div>
             <div class="card-body">
-                <div class="detail-row"><span class="detail-label">الكمية</span><span class="detail-value">{{ number_format((float)$workOrder->quantity, 2) }}</span></div>
-                <div class="detail-row"><span class="detail-label">سعر الوحدة</span><span class="detail-value">{{ number_format((float)$workOrder->unit_price, 2) }}</span></div>
-                <div class="detail-row"><span class="detail-label">الإجمالي</span><span class="detail-value fw-bold text-success">{{ number_format((float)$workOrder->total_price, 2) }}</span></div>
+                <div class="detail-row"><span class="detail-label">إجمالي الكميات</span><span class="detail-value">{{ number_format((float)$workOrder->quantity, 2) }}</span></div>
                 <div class="detail-row"><span class="detail-label">تاريخ التسليم</span><span class="detail-value">{{ $workOrder->due_date?->format('d/m/Y') ?? '—' }}</span></div>
                 <div class="detail-row"><span class="detail-label">تاريخ الإنشاء</span><span class="detail-value">{{ $workOrder->created_at?->format('d/m/Y H:i') }}</span></div>
                 @if($workOrder->orderBatch)
@@ -67,18 +63,32 @@
                         <thead class="table-light">
                             <tr>
                                 <th class="text-center" style="width: 50px;">#</th>
+                                <th>التصنيف</th>
+                                <th>خصائص التصنيف</th>
                                 <th>الصنف</th>
-                                <th>الخصائص</th>
+                                <th>خصائص الصنف</th>
                                 <th style="width: 15%;">التقدم</th>
                                 <th class="text-center">الكمية</th>
-                                <th class="text-end">سعر الوحدة</th>
-                                <th class="text-end">الإجمالي</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($workOrder->details as $idx => $detail)
                                 <tr>
                                     <td class="text-center text-muted small align-middle">{{ $idx + 1 }}</td>
+                                    <td class="align-middle">
+                                        {{ $detail->product->category->name ?? '—' }}
+                                    </td>
+                                    <td class="align-middle">
+                                        @if($detail->category_attributes && count($detail->category_attributes) > 0)
+                                            @foreach($detail->category_attributes as $attr)
+                                                <span class="badge bg-light text-dark border me-1" style="font-size: 0.75rem;">
+                                                    {{ $attr['name'] }}{{ !empty($attr['value']) ? ': ' . $attr['value'] : '' }}
+                                                </span>
+                                            @endforeach
+                                        @else
+                                            <span class="text-muted small">لا يوجد</span>
+                                        @endif
+                                    </td>
                                     <td class="align-middle">
                                         <strong>{{ $detail->product->name }}</strong>
                                         <div class="text-muted small">{{ $detail->product->sku }}</div>
@@ -91,7 +101,7 @@
                                                 </span>
                                             @endforeach
                                         @else
-                                            <span class="text-muted small">لا يوجد خصائص</span>
+                                            <span class="text-muted small">لا يوجد</span>
                                         @endif
                                     </td>
                                     <td class="align-middle">
@@ -110,18 +120,14 @@
                                             تم إنتاج {{ number_format($detail->produced_quantity, 0) }} من {{ number_format($detail->quantity, 0) }}
                                         </div>
                                     </td>
-                                    <td class="text-center align-middle">{{ number_format($detail->quantity, 2) }}</td>
-                                    <td class="text-end align-middle">{{ number_format($detail->unit_price, 2) }}</td>
-                                    <td class="text-end align-middle fw-bold">{{ number_format($detail->total_price, 2) }}</td>
+                                    <td class="text-center align-middle fw-bold">{{ number_format($detail->quantity, 2) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
                         <tfoot class="table-light">
                             <tr>
-                                <td colspan="4" class="text-start fw-bold">الإجمالي الكلي</td>
+                                <td colspan="6" class="text-start fw-bold">الإجمالي الكلي</td>
                                 <td class="text-center fw-bold">{{ number_format($workOrder->quantity, 2) }}</td>
-                                <td></td>
-                                <td class="text-end fw-bold text-success">{{ number_format($workOrder->total_price, 2) }}</td>
                             </tr>
                         </tfoot>
                     </table>
