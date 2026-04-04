@@ -34,7 +34,7 @@
 
 <div class="no-print text-center mb-4 d-flex justify-content-center align-items-center gap-2">
     <label for="copyCount" class="fw-bold mb-0">عدد النسخ:</label>
-    <input type="number" id="copyCount" class="form-control text-center" style="width: 80px;" value="{{ \App\Helpers\Setting::get('default_print_copies', 1) }}" min="1" max="20" onchange="generateCopies()">
+    <input type="number" id="copyCount" class="form-control text-center" style="width: 80px;" value="{{ \App\Helpers\Setting::get('default_print_copies_detailed', 1) }}" min="1" max="20" onchange="generateCopies()">
     <button class="btn btn-primary" onclick="window.print()"><i class="bi bi-printer"></i> طباعة</button>
     <a href="{{ route('work-orders.show', $workOrder) }}" class="btn btn-outline-secondary">رجوع</a>
 </div>
