@@ -3,6 +3,45 @@
 @section('title', 'تعديل المنتج')
 @section('page-title', 'تعديل المنتج')
 
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container .select2-selection--single {
+        height: 38px;
+        border: var(--bs-border-width) solid var(--bs-border-color);
+        border-radius: var(--bs-border-radius);
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 36px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+    }
+    [data-bs-theme="dark"] .select2-container--default .select2-selection--single {
+        background-color: #212529; /* Dark theme support */
+        border-color: #495057;
+    }
+    [data-bs-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #dee2e6;
+    }
+    [data-bs-theme="dark"] .select2-dropdown {
+        background-color: #212529;
+        border-color: #495057;
+    }
+    [data-bs-theme="dark"] .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: #343a40;
+    }
+    [data-bs-theme="dark"] .select2-container--default .select2-search--dropdown .select2-search__field {
+        background-color: #343a40;
+        color: #dee2e6;
+        border-color: #495057;
+    }
+    [data-bs-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #0d6efd;
+    }
+</style>
+@endpush
+
 @section('content')
 
 <div class="page-header">
@@ -23,8 +62,8 @@
                     @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-3">
-                    <label for="sku" class="form-label">SKU <span class="text-danger">*</span></label>
-                    <input type="text" name="sku" id="sku" class="form-control @error('sku') is-invalid @enderror" value="{{ old('sku', $product->sku) }}" required>
+                    <label for="sku" class="form-label">SKU</label>
+                    <input type="text" name="sku" id="sku" class="form-control @error('sku') is-invalid @enderror" value="{{ old('sku', $product->sku) }}">
                     @error('sku') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-3">
@@ -38,8 +77,8 @@
                     @error('category_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-3">
-                    <label for="uom" class="form-label">وحدة القياس <span class="text-danger">*</span></label>
-                    <select name="uom" id="uom" class="form-select @error('uom') is-invalid @enderror" required>
+                    <label for="uom" class="form-label">وحدة القياس</label>
+                    <select name="uom" id="uom" class="form-select @error('uom') is-invalid @enderror">
                         @foreach($units as $unit)
                             <option value="{{ $unit->value }}" {{ old('uom', $product->uom->value) == $unit->value ? 'selected' : '' }}>{{ $unit->label() }}</option>
                         @endforeach
@@ -47,8 +86,8 @@
                     @error('uom') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-3">
-                    <label for="unit_price" class="form-label">سعر الوحدة <span class="text-danger">*</span></label>
-                    <input type="number" step="0.01" name="unit_price" id="unit_price" class="form-control @error('unit_price') is-invalid @enderror" value="{{ old('unit_price', $product->unit_price) }}" required>
+                    <label for="unit_price" class="form-label">سعر الوحدة</label>
+                    <input type="number" step="0.01" name="unit_price" id="unit_price" class="form-control @error('unit_price') is-invalid @enderror" value="{{ old('unit_price', $product->unit_price) }}">
                     @error('unit_price') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-3">
@@ -88,9 +127,17 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function() {
     const existingSpecs = @json($product->specifications ?? []);
+
+    $('#category_id').select2({
+        placeholder: "اختر التصنيف...",
+        allowClear: true,
+        width: '100%',
+        dir: "rtl"
+    });
 
     $('#category_id').change(function() {
         let categoryId = $(this).val();

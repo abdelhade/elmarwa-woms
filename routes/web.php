@@ -9,6 +9,8 @@ use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\OrderBatchController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\CategoryAttributeController;
 use Illuminate\Support\Facades\Route;
 
 // ── Guest Routes ──
@@ -45,6 +47,9 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:users.delete')->group(function () {
         Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     });
+
+    // ── Employees Management ──
+    Route::resource('employees', EmployeeController::class);
 
     // ── CRUD Resources ──
     // Categories
@@ -98,8 +103,10 @@ Route::middleware('auth')->group(function () {
         Route::get('clients/{client}', [ClientController::class, 'show'])->name('clients.show');
     });
     Route::middleware('permission:clients.edit')->group(function () {
+        Route::post('clients/sort-batch', [ClientController::class, 'updateSortBatch'])->name('clients.updateSortBatch');
         Route::get('clients/{client}/edit', [ClientController::class, 'edit'])->name('clients.edit');
         Route::put('clients/{client}', [ClientController::class, 'update'])->name('clients.update');
+        Route::patch('clients/{client}/sort', [ClientController::class, 'updateSort'])->name('clients.updateSort');
     });
     Route::middleware('permission:clients.delete')->group(function () {
         Route::delete('clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
@@ -164,5 +171,21 @@ Route::middleware('auth')->group(function () {
     });
     Route::middleware('permission:attributes.delete')->group(function () {
         Route::delete('attributes/{attribute}', [AttributeController::class, 'destroy'])->name('attributes.destroy');
+    });
+
+    // Category Attributes
+    Route::middleware('permission:category-attributes.create')->group(function () {
+        Route::get('category-attributes/create', [CategoryAttributeController::class, 'create'])->name('category-attributes.create');
+        Route::post('category-attributes', [CategoryAttributeController::class, 'store'])->name('category-attributes.store');
+    });
+    Route::middleware('permission:category-attributes.view')->group(function () {
+        Route::get('category-attributes', [CategoryAttributeController::class, 'index'])->name('category-attributes.index');
+    });
+    Route::middleware('permission:category-attributes.edit')->group(function () {
+        Route::get('category-attributes/{category_attribute}/edit', [CategoryAttributeController::class, 'edit'])->name('category-attributes.edit');
+        Route::put('category-attributes/{category_attribute}', [CategoryAttributeController::class, 'update'])->name('category-attributes.update');
+    });
+    Route::middleware('permission:category-attributes.delete')->group(function () {
+        Route::delete('category-attributes/{category_attribute}', [CategoryAttributeController::class, 'destroy'])->name('category-attributes.destroy');
     });
 });

@@ -44,19 +44,26 @@
         <table class="table table-hover align-middle">
             <thead>
                 <tr>
+                    <th style="width: 40px;"></th>
                     <th>#</th>
                     <th>الاسم</th>
+                    <th>الترتيب</th>
                     <th>البريد الإلكتروني</th>
                     <th>الهاتف</th>
                     <th>حد الائتمان</th>
                     <th>الإجراءات</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="sortableClients">
                 @forelse($clients as $client)
-                    <tr>
+                    <tr data-id="{{ $client->id }}">
+                        <td class="drag-handle text-center" style="cursor: grab;"><i class="bi bi-arrows-move text-muted"></i></td>
                         <td>{{ $client->id }}</td>
                         <td class="fw-semibold">{{ $client->name }}</td>
+                        <td style="width: 100px;">
+                            <input type="number" class="form-control form-control-sm text-center sort-input" 
+                                   data-id="{{ $client->id }}" value="{{ $client->sort_order ?? '1' }}" min="1">
+                        </td>
                         <td>{{ $client->email ?? '—' }}</td>
                         <td>{{ $client->phone ?? '—' }}</td>
                         <td>{{ $client->credit_limit ? number_format((float)$client->credit_limit, 2) : '—' }}</td>
@@ -70,7 +77,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6"><div class="empty-state"><i class="bi bi-people d-block"></i><p>لا يوجد عملاء بعد.</p></div></td></tr>
+                    <tr><td colspan="8"><div class="empty-state"><i class="bi bi-people d-block"></i><p>لا يوجد عملاء بعد.</p></div></td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -125,6 +132,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
 $(document).ready(function() {
     $('#importForm').on('submit', function() {
@@ -143,6 +151,86 @@ $(document).ready(function() {
             window.print();
         }
     });
+
+    // Sort order inline update
+    $('.sort-input').on('change', function() {
+        let input = $(this);
+        let id = input.data('id');
+        let value = input.val();
+        
+        let originalBg = input.css('background-color');
+        input.prop('disabled', true);
+        
+        $.ajax({
+            url: `/clients/${id}/sort`,
+            method: 'PATCH',
+            data: {
+                _token: '{{ csrf_token() }}',
+                sort_order: value
+            },
+            success: function(response) {
+                if(response.success) {
+                    input.css('background-color', '#d1e7dd'); // success color
+                    setTimeout(() => input.css('background-color', originalBg), 1000);
+                }
+            },
+            error: function() {
+                input.css('background-color', '#f8d7da'); // error color
+                setTimeout(() => input.css('background-color', originalBg), 1000);
+                alert('حدث خطأ أثناء تحديث الترتيب');
+            },
+            complete: function() {
+                input.prop('disabled', false);
+            }
+        });
+    });
+
+    // Drag and Drop ordering
+    let sortableTbody = document.getElementById('sortableClients');
+    if (sortableTbody) {
+        new Sortable(sortableTbody, {
+            handle: '.drag-handle',
+            animation: 150,
+            onStart: function (evt) {
+                $(evt.item).css('background-color', '#fff3cd');
+            },
+            onEnd: function (evt) {
+                $(evt.item).css('background-color', '');
+                let order = [];
+                $(sortableTbody).find('tr[data-id]').each(function() {
+                    order.push($(this).data('id'));
+                });
+
+                let startIndex = {{ ($clients->currentPage() - 1) * $clients->perPage() + 1 }};
+
+                $.ajax({
+                    url: '{{ route("clients.updateSortBatch") }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        order: order,
+                        start_index: startIndex
+                    },
+                    success: function(response) {
+                        if(response.success) {
+                            let currIdx = startIndex;
+                            $(sortableTbody).find('tr[data-id]').each(function() {
+                                let input = $(this).find('.sort-input');
+                                input.val(currIdx);
+                                let origBg = input.css('background-color');
+                                input.css('background-color', '#d1e7dd');
+                                setTimeout(() => input.css('background-color', origBg), 800);
+                                currIdx++;
+                            });
+                        }
+                    },
+                    error: function() {
+                        alert('حدث خطأ أثناء حفظ الترتيب الجديد');
+                    }
+                });
+            }
+        });
+    }
 });
 </script>
 @endpush

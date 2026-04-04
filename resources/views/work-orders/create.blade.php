@@ -37,7 +37,7 @@
     }
     .wo-ac-wrap .wo-clear-search:hover { color: var(--bs-danger); }
 
-    .wo-ac-dropdown, .wo-client-dropdown {
+    .wo-client-dropdown {
         display: none;
         position: absolute;
         top: 100%;
@@ -51,8 +51,23 @@
         overflow-y: auto;
         box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
+    .wo-ac-dropdown {
+        display: none;
+        position: absolute;
+        bottom: 100%; /* Appear above */
+        left: 0;
+        right: 0;
+        z-index: 9999 !important;
+        background: #fff;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.5rem;
+        max-height: 300px;
+        overflow-y: auto;
+        box-shadow: 0 -10px 25px rgba(0,0,0,0.2); /* Shadow upwards */
+        margin-bottom: 5px;
+    }
     .wo-ac-dropdown.show, .wo-client-dropdown.show { display: block; animation: woFadeIn 0.2s ease; }
-    @keyframes woFadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes woFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     .wo-ac-dropdown table { margin-bottom: 0; font-size: 0.85rem; width: 100%; }
     .wo-ac-dropdown thead { position: sticky; top: 0; z-index: 2; background: var(--bs-light); }
@@ -171,6 +186,7 @@
         border-color: #86b7fe;
         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
     }
+    .table-responsive { overflow: visible !important; }
 </style>
 @endpush
 
@@ -228,6 +244,39 @@
                         @error('due_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                 </div>
+                
+                <div class="wo-form-row mt-3">
+                    <div class="wo-form-col">
+                        <label for="employee_id">الموظف</label>
+                        <select name="employee_id" id="employee_id" class="form-select form-select-sm @error('employee_id') is-invalid @enderror">
+                            <option value="">— اختر الموظف —</option>
+                            @foreach($employees ?? [] as $employee)
+                                <option value="{{ $employee->id }}" {{ old('employee_id') == $employee->id ? 'selected' : '' }}>{{ $employee->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('employee_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="wo-form-col">
+                        <label for="operator_id">المشغل</label>
+                        <select name="operator_id" id="operator_id" class="form-select form-select-sm @error('operator_id') is-invalid @enderror">
+                            <option value="">— اختر المشغل —</option>
+                            @foreach($employees ?? [] as $employee)
+                                <option value="{{ $employee->id }}" {{ old('operator_id') == $employee->id ? 'selected' : '' }}>{{ $employee->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('operator_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="wo-form-col">
+                        <label for="supervisor_id">مسؤول التشغيل</label>
+                        <select name="supervisor_id" id="supervisor_id" class="form-select form-select-sm @error('supervisor_id') is-invalid @enderror">
+                            <option value="">— اختر مسؤول التشغيل —</option>
+                            @foreach($employees ?? [] as $employee)
+                                <option value="{{ $employee->id }}" {{ old('supervisor_id') == $employee->id ? 'selected' : '' }}>{{ $employee->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('supervisor_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -237,7 +286,7 @@
                 <div class="wo-section-title mb-2"><i class="bi bi-box-seam"></i> أصناف أمر العمل</div>
 
                 {{-- Selected Details Table --}}
-                <div style="overflow-x: auto;">
+                <div class="table-responsive">
                     <table class="table table-bordered table-sm-custom wo-details-table mb-0" id="woDetailsTable">
                         <thead class="table-light">
                             <tr>
@@ -264,7 +313,7 @@
                                                style="background: none; outline: none; box-shadow: none;"
                                                placeholder="ابحث هنا لإضافة صنف جديد... (F2)" autocomplete="off">
                                         
-                                        <div class="wo-ac-dropdown" id="woAcDropdown" style="width: 100%; top: 100%;">
+                                        <div class="wo-ac-dropdown" id="woAcDropdown" style="width: 100%;">
                                             <table class="table table-hover mb-0">
                                                 <thead>
                                                     <tr class="bg-light">
@@ -734,12 +783,14 @@
                 '<td><input type="number" step="0.01" min="0" class="form-control form-control-sm price-input wo-detail-price" ' +
                     'value="' + d.price.toFixed(2) + '" data-idx="' + i + '"></td>' +
                 '<td class="fw-semibold wo-line-total">' + lineTotal + '</td>' +
-                '<td><button type="button" class="btn btn-sm btn-outline-danger wo-remove-row" data-idx="' + i + '" title="حذف">' +
-                    '<i class="bi bi-x-lg"></i></button></td>' +
+                '<td class="text-center align-middle">' +
+                    '<button type="button" class="btn btn-sm btn-outline-danger wo-remove-row" data-idx="' + i + '" title="حذف">' +
+                    '<i class="bi bi-x-lg"></i></button>' +
+                    '<div class="wo-hid-attrs" data-idx="' + i + '"></div>' +
+                '</td>' +
                 '<input type="hidden" name="details[' + i + '][product_id]" value="' + d.pid + '">' +
                 '<input type="hidden" name="details[' + i + '][quantity]" value="' + d.qty + '" class="wo-hid-qty" data-idx="' + i + '">' +
                 '<input type="hidden" name="details[' + i + '][unit_price]" value="' + d.price.toFixed(2) + '" class="wo-hid-price" data-idx="' + i + '">' +
-                '<div class="wo-hid-attrs" data-idx="' + i + '"></div>' +
                 '</tr>';
             $detBody.append(html);
             _woRenderRowAttributes(i);
@@ -819,22 +870,28 @@
     function _woRenderRowAttributes(idx) {
         var d = _woDetails[idx];
         var $row = $detBody.find('tr[data-idx="' + idx + '"]');
+        if (!$row.length) return;
+        
         var $list = $row.find('.wo-attr-list');
         var $hiddens = $row.find('.wo-hid-attrs');
         
         $list.empty();
         $hiddens.empty();
         
+        if (!d.attributes || !Array.isArray(d.attributes)) d.attributes = [];
+        
         d.attributes.forEach((attr, aIdx) => {
-            var displayText = attr.name + (attr.value ? ': ' + attr.value : '');
+            var name = attr.name || '';
+            var value = attr.value || '';
+            var displayText = name + (value ? ': ' + value : '');
             $list.append(
                 '<div class="wo-attr-badge">' + 
                     '<i class="bi bi-trash remove" data-idx="' + idx + '" data-aidx="' + aIdx + '" title="حذف"></i>' + 
-                    displayText + 
+                    _woEsc(displayText) + 
                 '</div>'
             );
-            $hiddens.append('<input type="hidden" name="details[' + idx + '][attributes][' + aIdx + '][name]" value="' + _woEsc(attr.name) + '">');
-            $hiddens.append('<input type="hidden" name="details[' + idx + '][attributes][' + aIdx + '][value]" value="' + _woEsc(attr.value) + '">');
+            $hiddens.append('<input type="hidden" name="details[' + idx + '][attributes][' + aIdx + '][name]" value="' + _woEsc(name) + '">');
+            $hiddens.append('<input type="hidden" name="details[' + idx + '][attributes][' + aIdx + '][value]" value="' + _woEsc(value) + '">');
         });
     }
 

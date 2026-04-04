@@ -29,7 +29,7 @@
     }
     .wo-ac-wrap .wo-clear-search:hover { color: var(--bs-danger); }
 
-    .wo-ac-dropdown, .wo-client-dropdown {
+    .wo-client-dropdown {
         display: none;
         position: absolute;
         top: 100%;
@@ -43,9 +43,24 @@
         overflow-y: auto;
         box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
+    .wo-ac-dropdown {
+        display: none;
+        position: absolute;
+        bottom: 100%; /* Appear above */
+        left: 0;
+        right: 0;
+        z-index: 9999 !important;
+        background: #fff;
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.5rem;
+        max-height: 300px;
+        overflow-y: auto;
+        box-shadow: 0 -10px 25px rgba(0,0,0,0.2); /* Shadow upwards */
+        margin-bottom: 5px;
+    }
     .table-responsive { overflow: visible !important; } 
     .wo-ac-dropdown.show, .wo-client-dropdown.show { display: block; animation: woFadeIn 0.2s ease; }
-    @keyframes woFadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes woFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     .wo-ac-dropdown table { margin-bottom: 0; font-size: 0.85rem; }
     .wo-ac-dropdown thead { position: sticky; top: 0; z-index: 2; background: var(--bs-light); }
@@ -108,9 +123,7 @@
         padding: 3px 10px;
         border-radius: 5px;
         font-size: .85rem;
-        min-width: 50px;
         text-align: center;
-    }
     }
 
     /* ── Attributes Styling ── */
@@ -216,6 +229,39 @@
                     @error('status') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
             </div>
+
+            <div class="row g-2 mt-2">
+                <div class="col-md-4">
+                    <label for="employee_id" class="form-label mb-1" style="font-size: 0.85rem;">الموظف</label>
+                    <select name="employee_id" id="employee_id" class="form-select form-select-sm @error('employee_id') is-invalid @enderror">
+                        <option value="">— اختر الموظف —</option>
+                        @foreach($employees ?? [] as $employee)
+                            <option value="{{ $employee->id }}" {{ old('employee_id', $workOrder->employee_id) == $employee->id ? 'selected' : '' }}>{{ $employee->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('employee_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+                <div class="col-md-4">
+                    <label for="operator_id" class="form-label mb-1" style="font-size: 0.85rem;">المشغل</label>
+                    <select name="operator_id" id="operator_id" class="form-select form-select-sm @error('operator_id') is-invalid @enderror">
+                        <option value="">— اختر المشغل —</option>
+                        @foreach($employees ?? [] as $employee)
+                            <option value="{{ $employee->id }}" {{ old('operator_id', $workOrder->operator_id) == $employee->id ? 'selected' : '' }}>{{ $employee->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('operator_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+                <div class="col-md-4">
+                    <label for="supervisor_id" class="form-label mb-1" style="font-size: 0.85rem;">مسؤول التشغيل</label>
+                    <select name="supervisor_id" id="supervisor_id" class="form-select form-select-sm @error('supervisor_id') is-invalid @enderror">
+                        <option value="">— اختر مسؤول التشغيل —</option>
+                        @foreach($employees ?? [] as $employee)
+                            <option value="{{ $employee->id }}" {{ old('supervisor_id', $workOrder->supervisor_id) == $employee->id ? 'selected' : '' }}>{{ $employee->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('supervisor_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+            </div>
         </div>
     </div>
 
@@ -252,7 +298,7 @@
                                            style="background: none; outline: none; box-shadow: none;"
                                            placeholder="ابحث هنا لإضافة صنف جديد... (F2)" autocomplete="off">
                                     
-                                    <div class="wo-ac-dropdown" id="woAcDropdown" style="width: 100%; top: 100%;">
+                                    <div class="wo-ac-dropdown" id="woAcDropdown" style="width: 100%;">
                                         <table class="table table-hover mb-0">
                                             <thead>
                                                 <tr class="bg-light">
@@ -484,8 +530,10 @@
                 <td class="p-1"><input type="number" step="0.01" name="details[${i}][quantity]" class="form-control form-control-sm qty-input" value="${d.qty}" data-idx="${i}"></td>
                 <td class="p-1"><input type="number" step="0.01" name="details[${i}][unit_price]" class="form-control form-control-sm price-input" value="${d.price}" data-idx="${i}"></td>
                 <td class="align-middle text-end fw-bold row-total">${rowTotal.toLocaleString(undefined, {minimumFractionDigits:2})}</td>
-                <td class="text-center align-middle"><button type="button" class="btn btn-link text-danger p-0 btn-remove" data-idx="${i}"><i class="bi bi-trash"></i></button></td>
-                <div class="wo-hid-attrs" data-idx="${i}"></div>
+                <td class="text-center align-middle">
+                    <button type="button" class="btn btn-link text-danger p-0 btn-remove" data-idx="${i}"><i class="bi bi-trash"></i></button>
+                    <div class="wo-hid-attrs" data-idx="${i}"></div>
+                </td>
             </tr>`;
             $detBody.append(row);
             _woRenderRowAttributes(i);
@@ -529,24 +577,28 @@
     function _woRenderRowAttributes(idx) {
         var d = _woDetails[idx];
         var $row = $detBody.find('tr[data-idx="' + idx + '"]');
+        if (!$row.length) return;
+        
         var $list = $row.find('.wo-attr-list');
         var $hiddens = $row.find('.wo-hid-attrs');
         
         $list.empty();
         $hiddens.empty();
         
-        if (!d.attributes) d.attributes = [];
+        if (!d.attributes || !Array.isArray(d.attributes)) d.attributes = [];
         
         d.attributes.forEach((attr, aIdx) => {
-            var displayText = attr.name + (attr.value ? ': ' + attr.value : '');
+            var name = attr.name || '';
+            var value = attr.value || '';
+            var displayText = name + (value ? ': ' + value : '');
             $list.append(
                 '<div class="wo-attr-badge">' + 
                     '<i class="bi bi-trash remove" data-idx="' + idx + '" data-aidx="' + aIdx + '" title="حذف"></i>' + 
-                    displayText + 
+                    _woEsc(displayText) + 
                 '</div>'
             );
-            $hiddens.append(`<input type="hidden" name="details[${idx}][attributes][${aIdx}][name]" value="${_woEsc(attr.name)}">`);
-            $hiddens.append(`<input type="hidden" name="details[${idx}][attributes][${aIdx}][value]" value="${_woEsc(attr.value)}">`);
+            $hiddens.append(`<input type="hidden" name="details[${idx}][attributes][${aIdx}][name]" value="${_woEsc(name)}">`);
+            $hiddens.append(`<input type="hidden" name="details[${idx}][attributes][${aIdx}][value]" value="${_woEsc(value)}">`);
         });
     }
 

@@ -28,6 +28,9 @@
                 <div class="detail-row"><span class="detail-label">العميل</span><span class="detail-value"><a href="{{ route('clients.show', $workOrder->client_id) }}">{{ $workOrder->client->name ?? '—' }}</a></span></div>
                 <div class="detail-row"><span class="detail-label">المنتج</span><span class="detail-value"><a href="{{ route('products.show', $workOrder->product_id) }}">{{ $workOrder->product->name ?? '—' }}</a></span></div>
                 <div class="detail-row"><span class="detail-label">التصنيف</span><span class="detail-value">{{ $workOrder->product->category->name ?? '—' }}</span></div>
+                <div class="detail-row"><span class="detail-label">الموظف</span><span class="detail-value">{{ $workOrder->employee->name ?? '—' }}</span></div>
+                <div class="detail-row"><span class="detail-label">المشغل</span><span class="detail-value">{{ $workOrder->operator->name ?? '—' }}</span></div>
+                <div class="detail-row"><span class="detail-label">مسؤول التشغيل</span><span class="detail-value">{{ $workOrder->supervisor->name ?? '—' }}</span></div>
             </div>
         </div>
     </div>

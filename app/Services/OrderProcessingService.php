@@ -69,6 +69,9 @@ class OrderProcessingService
                 'status' => WorkOrderStatus::Pending->value,
                 'due_date' => $data['due_date'] ?? null,
                 'notes' => $data['notes'] ?? null,
+                'employee_id' => $data['employee_id'] ?? null,
+                'operator_id' => $data['operator_id'] ?? null,
+                'supervisor_id' => $data['supervisor_id'] ?? null,
             ];
 
             $workOrder = $this->workOrderRepository->create($orderData);
@@ -112,6 +115,9 @@ class OrderProcessingService
                 'due_date' => $data['due_date'] ?? null,
                 'notes' => $data['notes'] ?? null,
                 'status' => $data['status'] ?? $workOrder->status->value,
+                'employee_id' => $data['employee_id'] ?? null,
+                'operator_id' => $data['operator_id'] ?? null,
+                'supervisor_id' => $data['supervisor_id'] ?? null,
             ];
 
             $workOrder->update($updateData);

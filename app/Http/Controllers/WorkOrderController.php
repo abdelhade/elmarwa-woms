@@ -10,6 +10,9 @@ use App\Models\Product;
 use App\Models\OrderBatch;
 use App\Models\WorkOrder;
 use App\Models\Attribute;
+use App\Models\Employee;
+use App\Models\Category;
+use App\Models\CategoryAttribute;
 use App\Services\OrderProcessingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,7 +27,7 @@ class WorkOrderController extends Controller
 
     public function index(Request $request): View
     {
-        $query = WorkOrder::with(['client', 'product', 'orderBatch', 'details.product']);
+        $query = WorkOrder::with(['client', 'product', 'orderBatch', 'details.product', 'employee', 'operator', 'supervisor']);
 
         if ($request->filled('search')) {
             $query->where('order_number', 'like', '%' . $request->search . '%');
@@ -51,7 +54,7 @@ class WorkOrderController extends Controller
         }
 
         $workOrders = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
-        $clients = Client::orderBy('name')->get();
+        $clients = Client::orderBy('sort_order')->orderBy('name')->get();
         $products = Product::orderBy('name')->get();
         $statuses = WorkOrderStatus::cases();
 
@@ -60,11 +63,14 @@ class WorkOrderController extends Controller
 
     public function create(): View
     {
-        $clients = Client::orderBy('name')->get();
+        $clients = Client::orderBy('sort_order')->orderBy('name')->get();
         $products = Product::with('category')->where('is_active', true)->orderBy('name')->get();
         $batches = OrderBatch::orderByDesc('created_at')->get();
         $allAttributes = Attribute::all();
-        return view('work-orders.create', compact('clients', 'products', 'batches', 'allAttributes'));
+        $allCategoryAttributes = CategoryAttribute::all();
+        $categories = Category::orderBy('name')->get();
+        $employees = Employee::where('is_active', true)->orderBy('name')->get();
+        return view('work-orders.create', compact('clients', 'products', 'batches', 'allAttributes', 'allCategoryAttributes', 'categories', 'employees'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -73,13 +79,20 @@ class WorkOrderController extends Controller
             'client_id' => 'required|exists:clients,id',
             'due_date' => 'nullable|date|after_or_equal:today',
             'order_batch_id' => 'nullable|exists:order_batches,id',
+            'employee_id' => 'nullable|exists:employees,id',
+            'operator_id' => 'nullable|exists:employees,id',
+            'supervisor_id' => 'nullable|exists:employees,id',
             'notes' => 'nullable|string',
             'details' => 'required|array|min:1',
             'details.*.product_id' => 'required|exists:products,id',
             'details.*.quantity' => 'required|numeric|min:0.01',
-            'details.*.unit_price' => 'required|numeric|min:0',
+            'details.*.category_attributes' => 'nullable|array',
             'details.*.attributes' => 'nullable|array',
         ]);
+        
+        foreach ($data['details'] as &$detail) {
+            $detail['unit_price'] = 0;
+        }
 
         $this->orderProcessingService->createWorkOrderWithDetails($data);
 
@@ -89,18 +102,19 @@ class WorkOrderController extends Controller
 
     public function show(WorkOrder $workOrder): View
     {
-        $workOrder->load(['client', 'product.category', 'orderBatch', 'details.product.category']);
+        $workOrder->load(['client', 'product.category', 'orderBatch', 'details.product.category', 'employee', 'operator', 'supervisor']);
         return view('work-orders.show', compact('workOrder'));
     }
 
     public function edit(WorkOrder $workOrder): View
     {
-        $clients = Client::orderBy('name')->get();
+        $clients = Client::orderBy('sort_order')->orderBy('name')->get();
         $products = Product::with('category')->where('is_active', true)->orderBy('name')->get();
         $batches = OrderBatch::orderByDesc('created_at')->get();
         $allAttributes = Attribute::all();
+        $employees = Employee::where('is_active', true)->orderBy('name')->get();
         $workOrder->load('details.product.category');
-        return view('work-orders.edit', compact('workOrder', 'clients', 'products', 'batches', 'allAttributes'));
+        return view('work-orders.edit', compact('workOrder', 'clients', 'products', 'batches', 'allAttributes', 'employees'));
     }
 
     public function update(Request $request, WorkOrder $workOrder): RedirectResponse
@@ -108,6 +122,9 @@ class WorkOrderController extends Controller
         $data = $request->validate([
             'client_id' => 'required|exists:clients,id',
             'order_batch_id' => 'nullable|exists:order_batches,id',
+            'employee_id' => 'nullable|exists:employees,id',
+            'operator_id' => 'nullable|exists:employees,id',
+            'supervisor_id' => 'nullable|exists:employees,id',
             'due_date' => 'nullable|date',
             'notes' => 'nullable|string',
             'status' => 'required|string',
@@ -142,13 +159,13 @@ class WorkOrderController extends Controller
 
     public function printDetailed(WorkOrder $workOrder): View
     {
-        $workOrder->load(['client', 'product.category', 'orderBatch', 'details.product.category']);
+        $workOrder->load(['client', 'product.category', 'orderBatch', 'details.product.category', 'employee', 'operator', 'supervisor']);
         return view('work-orders.print-detailed', compact('workOrder'));
     }
 
     public function printSummary(WorkOrder $workOrder): View
     {
-        $workOrder->load(['client', 'product.category', 'orderBatch', 'details.product.category']);
+        $workOrder->load(['client', 'product.category', 'orderBatch', 'details.product.category', 'employee', 'operator', 'supervisor']);
         
         $summary = $workOrder->details->groupBy(function($detail) {
             return $detail->product->category->name ?? 'بدون تصنيف';
@@ -161,7 +178,7 @@ class WorkOrderController extends Controller
 
     public function print(WorkOrder $workOrder): View
     {
-        $workOrder->load(['client', 'product.category', 'orderBatch', 'details.product.category']);
+        $workOrder->load(['client', 'product.category', 'orderBatch', 'details.product.category', 'employee', 'operator', 'supervisor']);
         return view('work-orders.print', compact('workOrder'));
     }
 

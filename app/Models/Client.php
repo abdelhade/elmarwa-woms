@@ -21,6 +21,7 @@ class Client extends Model
         'tax_number',
         'credit_limit',
         'is_active',
+        'sort_order',
     ];
 
     /**
@@ -31,6 +32,7 @@ class Client extends Model
         return [
             'credit_limit' => 'decimal:2',
             'is_active' => 'boolean',
+            'sort_order' => 'integer',
         ];
     }
 

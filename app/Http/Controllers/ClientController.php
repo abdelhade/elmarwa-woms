@@ -25,7 +25,7 @@ class ClientController extends Controller
             });
         }
 
-        $clients = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
+        $clients = $query->orderBy('sort_order')->orderByDesc('created_at')->paginate(15)->withQueryString();
 
         return view('clients.index', compact('clients'));
     }
@@ -43,6 +43,7 @@ class ClientController extends Controller
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string',
             'credit_limit' => 'nullable|numeric|min:0',
+            'sort_order' => 'nullable|integer|min:1',
         ]);
 
         Client::create($data);
@@ -72,6 +73,7 @@ class ClientController extends Controller
             'phone' => 'nullable|string|max:50',
             'address' => 'nullable|string',
             'credit_limit' => 'nullable|numeric|min:0',
+            'sort_order' => 'nullable|integer|min:1',
         ]);
 
         $client->update($data);
@@ -121,5 +123,39 @@ class ClientController extends Controller
             }
             fclose($file);
         }, 'clients_template.csv');
+    }
+
+    public function updateSort(Request $request, Client $client): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate([
+            'sort_order' => 'nullable|integer|min:1'
+        ]);
+
+        $client->update(['sort_order' => $data['sort_order']]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تحديث الترتيب بنجاح'
+        ]);
+    }
+
+    public function updateSortBatch(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'integer|exists:clients,id',
+            'start_index' => 'required|integer|min:1',
+        ]);
+
+        $currentIndex = $request->start_index;
+        foreach ($request->order as $id) {
+            Client::where('id', $id)->update(['sort_order' => $currentIndex]);
+            $currentIndex++;
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم حفظ الترتيب بنجاح'
+        ]);
     }
 }

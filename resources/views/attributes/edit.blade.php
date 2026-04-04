@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
-@section('title', 'تعديل خاصية: ' . $attribute->name)
-@section('page-title', 'تعديل خاصية')
+@section('title', 'تعديل خاصية الصنف: ' . $attribute->name)
+@section('page-title', 'تعديل خاصية الصنف')
 
 @section('content')
 
@@ -11,8 +11,7 @@
     <div class="col-md-8">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white py-3">
-                <h5 class="card-title mb-0 text-warning">
-                    <i class="bi bi-pencil-square me-2"></i>تعديل بيانات الخاصية
+                    <i class="bi bi-pencil-square me-2"></i>تعديل بيانات خاصية الصنف
                 </h5>
             </div>
             <div class="card-body p-4">

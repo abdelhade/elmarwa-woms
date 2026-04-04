@@ -26,6 +26,9 @@ class WorkOrder extends Model
         'specifications',
         'due_date',
         'notes',
+        'employee_id',
+        'operator_id',
+        'supervisor_id',
     ];
 
     /**
@@ -43,6 +46,9 @@ class WorkOrder extends Model
             'status' => WorkOrderStatus::class,
             'specifications' => 'array',
             'due_date' => 'date',
+            'employee_id' => 'integer',
+            'operator_id' => 'integer',
+            'supervisor_id' => 'integer',
         ];
     }
 
@@ -76,6 +82,21 @@ class WorkOrder extends Model
     public function details(): HasMany
     {
         return $this->hasMany(WorkOrderDetail::class);
+    }
+
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'employee_id');
+    }
+
+    public function operator(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'operator_id');
+    }
+
+    public function supervisor(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'supervisor_id');
     }
 
     /**

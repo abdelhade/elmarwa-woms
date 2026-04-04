@@ -1,13 +1,13 @@
 @extends('layouts.master')
 
-@section('title', 'الخصائص')
-@section('page-title', 'الخصائص')
+@section('title', 'خصائص الصنف')
+@section('page-title', 'خصائص الصنف')
 
 @section('content')
 
 {{-- Page Header --}}
 <div class="page-header">
-    <h4><i class="bi bi-list-stars me-2"></i>الخصائص</h4>
+    <h4><i class="bi bi-list-stars me-2"></i>خصائص الصنف</h4>
     <div class="d-flex gap-2">
         <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
             <i class="bi bi-printer me-1"></i>طباعة (F4)
@@ -109,7 +109,7 @@
                         <td colspan="6">
                             <div class="empty-state">
                                 <i class="bi bi-list-stars d-block"></i>
-                                <p>لا توجد خصائص بعد.</p>
+                                <p>لا توجد خصائص صنف بعد.</p>
                             </div>
                         </td>
                     </tr>

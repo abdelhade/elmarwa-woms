@@ -37,6 +37,11 @@
                     <input type="number" step="0.01" name="credit_limit" id="credit_limit" class="form-control @error('credit_limit') is-invalid @enderror" value="{{ old('credit_limit') }}">
                     @error('credit_limit') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
+                <div class="col-md-6">
+                    <label for="sort_order" class="form-label">الترتيب (اختياري)</label>
+                    <input type="number" name="sort_order" id="sort_order" class="form-control @error('sort_order') is-invalid @enderror" value="{{ old('sort_order', 1) }}">
+                    @error('sort_order') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
                 <div class="col-12">
                     <label for="address" class="form-label">العنوان</label>
                     <textarea name="address" id="address" rows="3" class="form-control @error('address') is-invalid @enderror">{{ old('address') }}</textarea>

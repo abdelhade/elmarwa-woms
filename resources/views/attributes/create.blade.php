@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
-@section('title', 'إضافة خاصية جديدة')
-@section('page-title', 'إضافة خاصية جديدة')
+@section('title', 'إضافة خاصية صنف جديدة')
+@section('page-title', 'إضافة خاصية صنف جديدة')
 
 @section('content')
 
@@ -11,8 +11,7 @@
     <div class="col-md-8">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white py-3">
-                <h5 class="card-title mb-0 text-primary">
-                    <i class="bi bi-plus-circle me-2"></i>بيانات الخاصية
+                    <i class="bi bi-plus-circle me-2"></i>بيانات خاصية الصنف
                 </h5>
             </div>
             <div class="card-body p-4">

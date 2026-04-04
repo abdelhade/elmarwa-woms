@@ -19,17 +19,25 @@
         @media print {
             body { padding: 0; }
             .no-print { display: none !important; }
+            .print-page { page-break-after: always; }
+            .print-page:last-child { page-break-after: auto; }
         }
     </style>
 </head>
 <body>
 
-<div class="no-print text-center mb-4">
-    <button class="btn btn-primary btn-print" onclick="window.print()">طباعة</button>
-    <a href="{{ route('work-orders.index') }}" class="btn btn-outline-secondary">رجوع</a>
+<div class="no-print text-center mb-4 d-flex justify-content-center align-items-center gap-2">
+    <label for="copyCount" class="fw-bold mb-0">عدد النسخ:</label>
+    <input type="number" id="copyCount" class="form-control text-center" style="width: 80px;" value="1" min="1" max="20" onchange="generateCopies()">
+    <button class="btn btn-primary" onclick="window.print()"><i class="bi bi-printer"></i> طباعة</button>
+    <a href="{{ route('work-orders.show', $workOrder) }}" class="btn btn-outline-secondary">رجوع</a>
 </div>
 
-<div class="print-header">
+<div id="renderContainer"></div>
+
+<template id="documentTemplate">
+    <div class="print-page">
+        <div class="print-header">
     <h2>أمر عمل (مجمع بالتصنيف)</h2>
     <p>{{ $workOrder->order_number }} — {{ $workOrder->created_at?->format('d/m/Y') }}</p>
 </div>
@@ -74,6 +82,24 @@
     <div style="text-align: center; width: 250px;"><div style="border-top: 1px solid #000; padding-top: 0.5rem;">توقيع مراقبة المخازن</div></div>
     <div style="text-align: center; width: 250px;"><div style="border-top: 1px solid #000; padding-top: 0.5rem;">توقيع مدير الإنتاج</div></div>
 </div>
+    </div>
+</template>
+
+<script>
+    function generateCopies() {
+        const container = document.getElementById('renderContainer');
+        const template = document.getElementById('documentTemplate').innerHTML;
+        const count = parseInt(document.getElementById('copyCount').value) || 1;
+        
+        container.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+            container.innerHTML += template;
+        }
+    }
+    
+    // Generate the first initial copy on page load
+    window.onload = generateCopies;
+</script>
 
 </body>
 </html>

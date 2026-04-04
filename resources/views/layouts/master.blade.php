@@ -158,7 +158,14 @@
             @if(auth()->user()->hasPermission('attributes.view'))
             <a href="{{ route('attributes.index') }}" class="nav-link {{ request()->routeIs('attributes.*') ? 'active' : '' }}">
                 <i class="bi bi-list-stars"></i>
-                الخصائص
+                خصائص الصنف
+            </a>
+            @endif
+
+            @if(auth()->user()->hasPermission('category-attributes.view'))
+            <a href="{{ route('category-attributes.index') }}" class="nav-link {{ request()->routeIs('category-attributes.*') ? 'active' : '' }}">
+                <i class="bi bi-card-list"></i>
+                خصائص التصنيف
             </a>
             @endif
 
@@ -170,6 +177,11 @@
                 العملاء
             </a>
             @endif
+
+            <a href="{{ route('employees.index') }}" class="nav-link {{ request()->routeIs('employees.*') ? 'active' : '' }}">
+                <i class="bi bi-person-badge"></i>
+                الموظفين
+            </a>
 
             @if(auth()->user()->hasPermission('users.view'))
             <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
