@@ -94,7 +94,7 @@
                         <td>{{ number_format((float)$order->total_price, 2) }}</td>
                         <td>
                             <div class="dropdown d-inline">
-                                <button class="btn btn-sm text-white dropdown-toggle badge-{{ $order->status->value }} rounded-pill px-2 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size:0.7rem; border:none;">
+                                <button class=" dropdown-toggle badge-{{ $order->status->value }} rounded-pill px-2 py-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size:0.9rem; border:none;">
                                     {{ $order->status->label() }}
                                 </button>
                                 <ul class="dropdown-menu shadow-sm" style="font-size:0.8rem; min-width:auto;">

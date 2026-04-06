@@ -257,7 +257,19 @@ class OrderProcessingService
      */
     protected function generateOrderNumber(): string
     {
-        return 'WO-' . strtoupper(Str::random(8));
+        $lastOrder = WorkOrder::orderBy('id', 'desc')->first();
+        
+        if (!$lastOrder) {
+            return '1';
+        }
+
+        $lastNumber = $lastOrder->order_number;
+        
+        if (is_numeric($lastNumber)) {
+            return (string) ((int) $lastNumber + 1);
+        }
+
+        return (string) ($lastOrder->id + 1);
     }
 
     /**
