@@ -3,6 +3,207 @@
 @section('title', 'لوحة التحكم')
 @section('page-title', 'لوحة التحكم')
 
+@push('styles')
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        --success-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #facc15 100%);
+        --info-gradient: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+        --danger-gradient: linear-gradient(135deg, #ef4444 0%, #f43f5e 100%);
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.05);
+        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+    
+    html[data-bs-theme="dark"] .stat-card, 
+    html[data-bs-theme="dark"] .chart-card, 
+    html[data-bs-theme="dark"] .table-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow);
+    }
+
+    .stat-card {
+        border-radius: 1.25rem;
+        border: none;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        position: relative;
+        background: #ffffff;
+    }
+    
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .stat-card:hover::after {
+        opacity: 1;
+    }
+
+    .stat-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        color: white;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover .stat-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .icon-primary { background: var(--primary-gradient); }
+    .icon-warning { background: var(--warning-gradient); text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .icon-success { background: var(--success-gradient); }
+    .icon-info { background: var(--info-gradient); }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 0.25rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-family: 'Inter', 'Cairo', sans-serif;
+    }
+    
+    html[data-bs-theme="dark"] .stat-value {
+        -webkit-text-fill-color: #f8fafc;
+        background: none;
+        text-shadow: 0 2px 10px rgba(255,255,255,0.1);
+    }
+
+    .stat-label {
+        font-size: 0.95rem;
+        color: #64748b;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    
+    html[data-bs-theme="dark"] .stat-label {
+        color: #94a3b8;
+    }
+
+    .chart-card, .table-card {
+        border-radius: 1.25rem;
+        border: none;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: #ffffff;
+    }
+    
+    .chart-card:hover, .table-card:hover {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        transform: translateY(-4px);
+    }
+
+    .card-header {
+        background-color: transparent;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        font-weight: 700;
+        font-size: 1.15rem;
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    html[data-bs-theme="dark"] .card-header {
+        border-bottom-color: rgba(255,255,255,0.08);
+        color: #f1f5f9;
+    }
+
+    .card-header i {
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 1.25rem;
+    }
+    
+    html[data-bs-theme="dark"] .card-header i {
+        -webkit-text-fill-color: #818cf8;
+    }
+
+    .table > :not(caption) > * > * {
+        padding: 1rem 1.5rem;
+        border-bottom-color: rgba(0,0,0,0.05);
+        vertical-align: middle;
+    }
+    
+    html[data-bs-theme="dark"] .table > :not(caption) > * > * {
+        border-bottom-color: rgba(255,255,255,0.05);
+        color: #e2e8f0;
+    }
+
+    .table tbody tr {
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(99, 102, 241, 0.04);
+        transform: scale(1.005);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        z-index: 10;
+        position: relative;
+        border-radius: 0.5rem;
+    }
+    
+    html[data-bs-theme="dark"] .table tbody tr:hover {
+        background-color: rgba(99, 102, 241, 0.1);
+    }
+
+    .badge {
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 0.4em 0.8em;
+    }
+    
+    .list-group-item {
+        border-color: rgba(0,0,0,0.05);
+        transition: all 0.2s ease;
+        margin-bottom: 2px;
+        border-radius: 0.5rem !important;
+    }
+    
+    html[data-bs-theme="dark"] .list-group-item {
+        border-color: rgba(255,255,255,0.05);
+        background: transparent;
+        color: #e2e8f0;
+    }
+    
+    .list-group-item:hover {
+        background-color: rgba(99, 102, 241, 0.04);
+        padding-right: 1.5rem !important;
+        transform: translateX(-4px);
+    }
+    
+    html[data-bs-theme="dark"] .list-group-item:hover {
+        background-color: rgba(99, 102, 241, 0.1);
+    }
+</style>
+@endpush
+
 @section('content')
 
 {{-- بطاقات الإحصائيات --}}
