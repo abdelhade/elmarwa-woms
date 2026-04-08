@@ -79,7 +79,7 @@
                         <td><code>{{ $product->sku }}</code></td>
                         <td class="fw-semibold">{{ $product->name }}</td>
                         <td>{{ $product->category->name ?? '—' }}</td>
-                        <td>{{ $product->uom->label() }}</td>
+                        <td>{{ $product->uom?->label() ?? '—' }}</td>
                         <td>{{ number_format((float)$product->unit_price, 2) }}</td>
                         <td>{{ $product->waste_rate }}%</td>
                         <td class="actions-cell">
