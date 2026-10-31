@@ -34,7 +34,7 @@
                 </div>
                 <div class="col-md-6">
                     <label for="credit_limit" class="form-label">حد الائتمان</label>
-                    <input type="number" step="0.01" name="credit_limit" id="credit_limit" class="form-control @error('credit_limit') is-invalid @enderror" value="{{ old('credit_limit', $client->credit_limit) }}">
+                    <input type="number" step="0.01" min="0" name="credit_limit" id="credit_limit" class="form-control @error('credit_limit') is-invalid @enderror" value="{{ old('credit_limit', $client->credit_limit) ?? '0' }}">
                     @error('credit_limit') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-6">

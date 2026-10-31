@@ -108,32 +108,71 @@ class WorkOrderController extends Controller
 
     public function edit(WorkOrder $workOrder): View
     {
+        $workOrder->load(['client', 'details.product.category']);
+
         $clients = Client::orderBy('sort_order')->orderBy('name')->get();
-        $products = Product::with('category')->where('is_active', true)->orderBy('name')->get();
+        $detailProductIds = $workOrder->details->pluck('product_id')->filter()->all();
+        $products = Product::with('category')
+            ->where(function ($query) use ($detailProductIds) {
+                $query->where('is_active', true);
+                if ($detailProductIds !== []) {
+                    $query->orWhereIn('id', $detailProductIds);
+                }
+            })
+            ->orderBy('name')
+            ->get();
         $batches = OrderBatch::orderByDesc('created_at')->get();
         $allAttributes = Attribute::all();
-        $employees = Employee::where('is_active', true)->orderBy('name')->get();
-        $workOrder->load('details.product.category');
-        return view('work-orders.edit', compact('workOrder', 'clients', 'products', 'batches', 'allAttributes', 'employees'));
+        $allCategoryAttributes = CategoryAttribute::all();
+        $categories = Category::orderBy('name')->get();
+        $assignedIds = array_values(array_filter([
+            $workOrder->employee_id,
+            $workOrder->operator_id,
+            $workOrder->supervisor_id,
+        ]));
+        $employees = Employee::query()
+            ->where(function ($query) use ($assignedIds) {
+                $query->where('is_active', true);
+                if ($assignedIds !== []) {
+                    $query->orWhereIn('id', $assignedIds);
+                }
+            })
+            ->orderBy('name')
+            ->get();
+
+        return view('work-orders.edit', compact(
+            'workOrder',
+            'clients',
+            'products',
+            'batches',
+            'allAttributes',
+            'allCategoryAttributes',
+            'categories',
+            'employees'
+        ));
     }
 
     public function update(Request $request, WorkOrder $workOrder): RedirectResponse
     {
         $data = $request->validate([
             'client_id' => 'required|exists:clients,id',
+            'due_date' => 'nullable|date',
             'order_batch_id' => 'nullable|exists:order_batches,id',
             'employee_id' => 'nullable|exists:employees,id',
             'operator_id' => 'nullable|exists:employees,id',
             'supervisor_id' => 'nullable|exists:employees,id',
-            'due_date' => 'nullable|date',
             'notes' => 'nullable|string',
-            'status' => 'required|string',
             'details' => 'required|array|min:1',
             'details.*.product_id' => 'required|exists:products,id',
             'details.*.quantity' => 'required|numeric|min:0.01',
-            'details.*.unit_price' => 'required|numeric|min:0',
+            'details.*.category_attributes' => 'nullable|array',
             'details.*.attributes' => 'nullable|array',
         ]);
+
+        foreach ($data['details'] as &$detail) {
+            $detail['unit_price'] = 0;
+        }
+        unset($detail);
 
         $this->orderProcessingService->updateWorkOrderWithDetails($workOrder, $data);
 

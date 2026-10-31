@@ -12,6 +12,15 @@ class Client extends Model
 {
     use HasFactory;
 
+    protected static function booted(): void
+    {
+        static::saving(function (Client $client): void {
+            if ($client->credit_limit === null || $client->credit_limit === '') {
+                $client->credit_limit = 0;
+            }
+        });
+    }
+
     protected $fillable = [
         'name',
         'email',
