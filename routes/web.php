@@ -115,6 +115,7 @@ Route::middleware('auth')->group(function () {
     });
     Route::middleware('permission:clients.delete')->group(function () {
         Route::delete('clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
+        Route::delete('clients', [ClientController::class, 'bulkDestroy'])->name('clients.bulkDestroy');
     });
 
     // Work Orders

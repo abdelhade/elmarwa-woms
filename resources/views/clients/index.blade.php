@@ -20,6 +20,29 @@
 
 @include('partials.alerts')
 
+{{-- Bulk Action Bar --}}
+<div id="bulkBar" class="d-none mb-3">
+    <div class="card border-primary shadow-sm">
+        <div class="card-body py-2 px-3 d-flex align-items-center gap-3">
+            <span class="fw-semibold text-primary">
+                <i class="bi bi-check2-square me-1"></i>
+                تم تحديد <span id="selectedCount">0</span> عميل
+            </span>
+            <form id="bulkDeleteForm" action="{{ route('clients.bulkDestroy') }}" method="POST" class="d-inline">
+                @csrf
+                @method('DELETE')
+                <div id="bulkIdsContainer"></div>
+                <button type="button" id="btnBulkDelete" class="btn btn-danger btn-sm">
+                    <i class="bi bi-trash me-1"></i>حذف المحدد
+                </button>
+            </form>
+            <button type="button" id="btnClearSelection" class="btn btn-outline-secondary btn-sm ms-auto">
+                <i class="bi bi-x-lg me-1"></i>إلغاء التحديد
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="card filter-bar">
     <div class="card-body">
         <form method="GET" action="{{ route('clients.index') }}">
@@ -44,6 +67,9 @@
         <table class="table table-hover align-middle">
             <thead>
                 <tr>
+                    <th style="width: 40px;" class="text-center">
+                        <input type="checkbox" id="selectAll" class="form-check-input" title="تحديد الكل">
+                    </th>
                     <th style="width: 40px;"></th>
                     <th>#</th>
                     <th>الاسم</th>
@@ -57,6 +83,9 @@
             <tbody id="sortableClients">
                 @forelse($clients as $client)
                     <tr data-id="{{ $client->id }}">
+                        <td class="text-center">
+                            <input type="checkbox" class="form-check-input row-checkbox" value="{{ $client->id }}">
+                        </td>
                         <td class="drag-handle text-center" style="cursor: grab;"><i class="bi bi-arrows-move text-muted"></i></td>
                         <td>{{ $client->id }}</td>
                         <td class="fw-semibold">{{ $client->name }}</td>
@@ -77,7 +106,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="8"><div class="empty-state"><i class="bi bi-people d-block"></i><p>لا يوجد عملاء بعد.</p></div></td></tr>
+                    <tr><td colspan="9"><div class="empty-state"><i class="bi bi-people d-block"></i><p>لا يوجد عملاء بعد.</p></div></td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -138,6 +167,53 @@ $(document).ready(function() {
     $('#importForm').on('submit', function() {
         $('#btnSubmitImport').prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i>جاري الاستيراد...');
         $('#importStatus').removeClass('d-none');
+    });
+
+    // ── Bulk Selection ──
+    function updateBulkBar() {
+        let checked = $('.row-checkbox:checked');
+        let count = checked.length;
+        if (count > 0) {
+            $('#selectedCount').text(count);
+            $('#bulkBar').removeClass('d-none');
+        } else {
+            $('#bulkBar').addClass('d-none');
+        }
+        // Sync select-all state
+        let total = $('.row-checkbox').length;
+        $('#selectAll').prop('indeterminate', count > 0 && count < total);
+        $('#selectAll').prop('checked', count === total && total > 0);
+    }
+
+    $('#selectAll').on('change', function() {
+        $('.row-checkbox').prop('checked', this.checked);
+        updateBulkBar();
+    });
+
+    $(document).on('change', '.row-checkbox', function() {
+        updateBulkBar();
+    });
+
+    $('#btnClearSelection').on('click', function() {
+        $('.row-checkbox, #selectAll').prop('checked', false);
+        $('#selectAll').prop('indeterminate', false);
+        $('#bulkBar').addClass('d-none');
+    });
+
+    $('#btnBulkDelete').on('click', function() {
+        let checked = $('.row-checkbox:checked');
+        if (checked.length === 0) return;
+
+        if (!confirm(`هل أنت متأكد من حذف ${checked.length} عميل؟ لن يتم حذف العملاء المرتبطين بأوامر عمل.`)) return;
+
+        // Build hidden inputs
+        let container = $('#bulkIdsContainer');
+        container.empty();
+        checked.each(function() {
+            container.append(`<input type="hidden" name="ids[]" value="${$(this).val()}">`);
+        });
+
+        $('#bulkDeleteForm').submit();
     });
 
     // اختصار F3 للإضافة الجديدة

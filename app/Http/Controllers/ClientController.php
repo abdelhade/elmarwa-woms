@@ -94,6 +94,27 @@ class ClientController extends Controller
             ->with('success', 'تم حذف العميل بنجاح.');
     }
 
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'ids'   => 'required|array|min:1',
+            'ids.*' => 'integer|exists:clients,id',
+        ]);
+
+        $ids = $request->ids;
+
+        // Skip clients that have work orders
+        $skipped = Client::whereIn('id', $ids)->whereHas('workOrders')->count();
+        $deleted = Client::whereIn('id', $ids)->whereDoesntHave('workOrders')->delete();
+
+        $msg = "تم حذف {$deleted} عميل بنجاح.";
+        if ($skipped > 0) {
+            $msg .= " تم تخطي {$skipped} عميل مرتبط بأوامر عمل.";
+        }
+
+        return redirect()->route('clients.index')->with('success', $msg);
+    }
+
     public function import(Request $request): RedirectResponse
     {
         $request->validate([
