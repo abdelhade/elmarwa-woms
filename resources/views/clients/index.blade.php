@@ -159,6 +159,10 @@
 @endsection
 
 @push('scripts')
+<style>
+.sortable-col:hover { background-color: rgba(0,0,0,.04); user-select: none; }
+.sortable-col       { white-space: nowrap; }
+</style>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <script>
 $(document).ready(function() {
@@ -257,6 +261,50 @@ $(document).ready(function() {
                 input.prop('disabled', false);
             }
         });
+    });
+
+    // ── Column Header Sorting ──
+    let sortState = { col: null, dir: 'asc' };
+
+    // Map th index → data-col value index in the row (0-based td index)
+    // th cols: 0=checkbox, 1=drag, 2=id, 3=name, 4=sort_order, 5=email, 6=phone, 7=credit_limit, 8=actions
+    const colTdIndex = { id: 2, name: 3, sort_order: 4, email: 5, phone: 6, credit_limit: 7 };
+
+    $('.sortable-col').on('click', function () {
+        let col = $(this).data('col');
+        if (sortState.col === col) {
+            sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortState.col = col;
+            sortState.dir = 'asc';
+        }
+
+        // Update icons
+        $('.sortable-col i').attr('class', 'bi bi-arrow-down-up text-muted small');
+        let icon = sortState.dir === 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down';
+        $(this).find('i').attr('class', icon + ' text-primary small');
+
+        let tbody = $('#sortableClients');
+        let rows = tbody.find('tr[data-id]').toArray();
+        let tdIdx = colTdIndex[col];
+        let numeric = ['id', 'sort_order', 'credit_limit'].includes(col);
+
+        rows.sort(function (a, b) {
+            let aVal = $(a).find('td').eq(tdIdx).data('val') ?? '';
+            let bVal = $(b).find('td').eq(tdIdx).data('val') ?? '';
+            if (numeric) {
+                aVal = parseFloat(aVal) || 0;
+                bVal = parseFloat(bVal) || 0;
+            } else {
+                aVal = String(aVal).toLowerCase();
+                bVal = String(bVal).toLowerCase();
+            }
+            if (aVal < bVal) return sortState.dir === 'asc' ? -1 : 1;
+            if (aVal > bVal) return sortState.dir === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        $.each(rows, function (i, row) { tbody.append(row); });
     });
 
     // Drag and Drop ordering
