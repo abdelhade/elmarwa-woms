@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CategoryAttribute extends Model
 {
     protected $fillable = [
+        'category_id',
         'name',
         'type',
         'options',
