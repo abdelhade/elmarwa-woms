@@ -111,9 +111,7 @@
             </tbody>
         </table>
     </div>
-    @if($clients->hasPages())
-        <div class="card-footer d-flex justify-content-center">{{ $clients->links() }}</div>
-    @endif
+
 </div>
 
 
@@ -277,7 +275,7 @@ $(document).ready(function() {
                     order.push($(this).data('id'));
                 });
 
-                let startIndex = {{ ($clients->currentPage() - 1) * $clients->perPage() + 1 }};
+                let startIndex = 1;
 
                 $.ajax({
                     url: '{{ route("clients.updateSortBatch") }}',

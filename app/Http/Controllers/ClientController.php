@@ -25,7 +25,7 @@ class ClientController extends Controller
             });
         }
 
-        $clients = $query->orderBy('sort_order')->orderByDesc('created_at')->paginate(15)->withQueryString();
+        $clients = $query->orderBy('sort_order')->orderByDesc('created_at')->get();
 
         return view('clients.index', compact('clients'));
     }
