@@ -71,12 +71,12 @@
                         <input type="checkbox" id="selectAll" class="form-check-input" title="تحديد الكل">
                     </th>
                     <th style="width: 40px;"></th>
-                    <th>#</th>
-                    <th>الاسم</th>
-                    <th>الترتيب</th>
-                    <th>البريد الإلكتروني</th>
-                    <th>الهاتف</th>
-                    <th>حد الائتمان</th>
+                    <th class="sortable-col" data-col="id" style="cursor:pointer;"># <i class="bi bi-arrow-down-up text-muted small"></i></th>
+                    <th class="sortable-col" data-col="name" style="cursor:pointer;">الاسم <i class="bi bi-arrow-down-up text-muted small"></i></th>
+                    <th class="sortable-col" data-col="sort_order" style="cursor:pointer;">الترتيب <i class="bi bi-arrow-down-up text-muted small"></i></th>
+                    <th class="sortable-col" data-col="email" style="cursor:pointer;">البريد الإلكتروني <i class="bi bi-arrow-down-up text-muted small"></i></th>
+                    <th class="sortable-col" data-col="phone" style="cursor:pointer;">الهاتف <i class="bi bi-arrow-down-up text-muted small"></i></th>
+                    <th class="sortable-col" data-col="credit_limit" style="cursor:pointer;">حد الائتمان <i class="bi bi-arrow-down-up text-muted small"></i></th>
                     <th>الإجراءات</th>
                 </tr>
             </thead>
@@ -87,15 +87,15 @@
                             <input type="checkbox" class="form-check-input row-checkbox" value="{{ $client->id }}">
                         </td>
                         <td class="drag-handle text-center" style="cursor: grab;"><i class="bi bi-arrows-move text-muted"></i></td>
-                        <td>{{ $client->id }}</td>
-                        <td class="fw-semibold">{{ $client->name }}</td>
-                        <td style="width: 100px;">
+                        <td data-val="{{ $client->id }}">{{ $client->id }}</td>
+                        <td class="fw-semibold" data-val="{{ strtolower($client->name) }}">{{ $client->name }}</td>
+                        <td style="width: 100px;" data-val="{{ $client->sort_order ?? 0 }}">
                             <input type="number" class="form-control form-control-sm text-center sort-input" 
                                    data-id="{{ $client->id }}" value="{{ $client->sort_order ?? '1' }}" min="1">
                         </td>
-                        <td>{{ $client->email ?? '—' }}</td>
-                        <td>{{ $client->phone ?? '—' }}</td>
-                        <td>{{ $client->credit_limit ? number_format((float)$client->credit_limit, 2) : '—' }}</td>
+                        <td data-val="{{ strtolower($client->email ?? '') }}">{{ $client->email ?? '—' }}</td>
+                        <td data-val="{{ $client->phone ?? '' }}">{{ $client->phone ?? '—' }}</td>
+                        <td data-val="{{ $client->credit_limit ?? 0 }}">{{ $client->credit_limit ? number_format((float)$client->credit_limit, 2) : '—' }}</td>
                         <td class="actions-cell">
                             <a href="{{ route('clients.show', $client) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
                             <a href="{{ route('clients.edit', $client) }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
